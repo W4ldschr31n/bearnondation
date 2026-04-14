@@ -25,6 +25,21 @@ class Tile:
 			self.current_filling = filling
 			self.current_flow = flow
 	
+	func is_filled() -> bool:
+		return max_filling <= current_filling
+	
+	func is_flowing() -> bool:
+		return max_flow <= current_flow
+		
+	func send_flow(amount : int) -> int:
+		if(!is_filled()):
+			var fill_qty = min(max_filling - current_filling, amount)
+			amount -= fill_qty
+		elif(!is_flowing()):
+			var flow_qty = min(max_flow - current_flow, amount)
+			amount -= flow_qty
+		return amount
+	
 	static func NewLand():
 		return Tile.new(0, false, 10, 10)
 	
@@ -47,24 +62,31 @@ var height: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Only if launched from editor directly
+	if get_tree().current_scene == self:
+		_self_init()
+	
+func _init_board_8x4():
 	_init_with_board(
 		# Tiles
 		[
 			Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(),
 				Tile.NewHill(), Tile.NewMountain(), Tile.NewMountain(), Tile.NewMountain(),
-			Tile.NewForest(), Tile.NewForest(), Tile.NewSource(100), Tile.NewForest(),
-				Tile.NewHill(), Tile.NewMountain(), Tile.NewMountain(), Tile.NewMountain(),
+			Tile.NewForest(), Tile.NewForest(), Tile.NewSource(200), Tile.NewForest(),
+				Tile.NewHill(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(),
 		],
 		# Width
 		8,
 		# Height
 		4
 	)
+
+func _self_init():
+	_init_board_8x4()
 	print_board()
 	print("Processing sources")
 	process_sources()
 	print_board()
-
 
 func _init_with_board(board: Array[Tile], width, height) -> void:
 	var current_x = 0
@@ -78,6 +100,7 @@ func _init_with_board(board: Array[Tile], width, height) -> void:
 	tiles.resize(width)
 	for i in width:
 		tiles[i].resize(height)
+	sources = []
 	
 	# Check size matches
 	var expected_size = width * height/2
@@ -144,7 +167,13 @@ func print_board():
 
 func trickle_down(source: Tile):
 	var flow_to_unload = source.current_flow
-	var tiles_to_check = get_tile_neighbours(source)
+	var source_neighbours = get_tile_neighbours(source)
+	source_neighbours.reverse()
+	var tiles_to_check = []
+	for n in source_neighbours:
+		var neighbour = get_tile(n[0], n[1])
+		if(neighbour.height == source.height-1 && neighbour.current_flow < neighbour.max_flow):
+			tiles_to_check.push_front(n)
 	var checked_tiles = [[source.x, source.y]]
 	while(flow_to_unload>0 and tiles_to_check.size()>0):
 		print(flow_to_unload)
@@ -158,11 +187,20 @@ func trickle_down(source: Tile):
 		# Neighbours must be added in reverse order
 		new_neighbours.reverse()
 		for n in new_neighbours:
-			if(!checked_tiles.has(n) && !tiles_to_check.has(n)):
+			var neighbour = get_tile(n[0], n[1])
+			if(
+				# Avoid duplicate checks
+				!checked_tiles.has(n) && !tiles_to_check.has(n)
+				# Only check if available
+			 	&& neighbour.height==tile.height-1 && neighbour.current_flow<neighbour.max_flow
+			):
 				tiles_to_check.push_front(n)
 	
 	if(flow_to_unload>0):
 		print("WATER OVERFLOW : ", flow_to_unload)
+
+func get_tile(x, y) -> Tile:
+	return tiles[x][y]
 
 func get_tile_neighbours(tile : Tile):
 	var neighbours = []
@@ -193,6 +231,9 @@ func process_sources():
 	for coordinates in sources:
 		var source : Tile = tiles[coordinates[0]][coordinates[1]]
 		trickle_down(source)
+		
+func process_board():
+	process_sources()
 
 func _on_step_timer_timeout() -> void:
 	# Process the board
