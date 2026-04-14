@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dpyp4pft5p31f"]
+
+[ext_resource type="Script" uid="uid://bydtwysn4671l" path="res://scripts/simulation.gd" id="1_y5vwh"]
+
+[node name="Simulation" type="Node" unique_id=660034502]
+script = ExtResource("1_y5vwh")
+
+[node name="StepTimer" type="Timer" parent="." unique_id=1628943997]
+wait_time = 5.0
+
+[connection signal="timeout" from="StepTimer" to="." method="_on_step_timer_timeout"]
