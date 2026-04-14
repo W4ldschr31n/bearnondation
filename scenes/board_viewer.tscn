@@ -1,6 +1,22 @@
 [gd_scene format=3 uid="uid://b25qbw3gewhaq"]
 
 [ext_resource type="Script" uid="uid://cx7qh7bbx18iq" path="res://scripts/board_viewer.gd" id="1_co73x"]
+[ext_resource type="Texture2D" uid="uid://gilphs47c24f" path="res://textures/hexa_tilemap.png" id="2_t7b7u"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jyyrd"]
+texture = ExtResource("2_t7b7u")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_p5xr7"]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_jyyrd")
 
 [node name="BoardViewer" type="Node" unique_id=618590062]
 script = ExtResource("1_co73x")
@@ -35,6 +51,25 @@ custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Print"
 
+[node name="DisplayGridButton" type="Button" parent="Buttons/VBoxContainer" unique_id=1277328050]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+text = "DisplayGrid"
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=248759777]
+position = Vector2(488, 149)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_p5xr7")
+
+[node name="TileMarkers" type="Node2D" parent="." unique_id=1993501411]
+
+[node name="Labels" type="Control" parent="." unique_id=1232143293]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [connection signal="pressed" from="Buttons/VBoxContainer/InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/ProcessButton" to="." method="_on_process_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/PrintButton" to="." method="_on_print_button_pressed"]
+[connection signal="pressed" from="Buttons/VBoxContainer/DisplayGridButton" to="." method="_on_display_grid_button_pressed"]
