@@ -2,8 +2,10 @@ extends Node
 
 @export var simulation: Simulation
 @onready var tile_map_layer: TileMapLayer = $TileMapLayer
+@onready var highlight_layer: TileMapLayer = $HighlightLayer
 @onready var labels: Control = $Labels
 @onready var ghost: Sprite2D = $SatelliteGhost
+@onready var timer_label: Label = $Buttons/TimerLabel
 
 var tile_info_scene = preload("res://scenes/TileInfo.tscn")
 var tile_infos : Array[Array]
@@ -15,65 +17,52 @@ func _ready() -> void:
 	if simulation == null:
 		simulation = get_parent().get_node("Simulation")
 	ghost.visible = false
-
-@onready var timer_label: Label = $Buttons/TimerLabel
+	if highlight_layer:
+		highlight_layer.clear()
 
 func _process(_delta: float) -> void:
 	if is_placing_satellite:
 		update_satellite_ghost_position()
+		update_preview_zone()
+	else:
+		if highlight_layer:
+			highlight_layer.clear()
 	
 	update_timer_display()
 
 func update_timer_display():
 	if simulation and simulation.turn_timer:
 		var time_left = simulation.turn_timer.time_left
-		
 		timer_label.text = "Prochain scan : %.1f s" % time_left
+		timer_label.modulate = Color.RED if time_left < 5.0 else Color.WHITE
 
-func init_grid():
-	tile_map_layer.clear()
-	for child in labels.get_children():
-		child.queue_free()
-	tile_infos = []
-	tile_infos.resize(simulation.width)
-	for i in simulation.width:
-		tile_infos[i].resize(simulation.height)
+# LOGIQUE DE PRÉVISUALISATION
+
+func update_preview_zone():
+	if !highlight_layer: return
+	highlight_layer.clear()
 	
-	var source_id = 0
-	var is_odd_row = false
+	var mouse_pos = tile_map_layer.get_local_mouse_position()
+	var grid_pos = tile_map_layer.local_to_map(mouse_pos)
 	
-	for y in simulation.height:
-		for x in range(1 if is_odd_row else 0, simulation.width, 2):
-			var tile = simulation.get_tile(x, y)
-			var cell_coordinates = Vector2i(tile.x, tile.y/2)
-			tile_map_layer.set_cell(cell_coordinates, source_id, Vector2i(4-tile.height, 0))
-			var new_widget : TileInfo = tile_info_scene.instantiate()
-			labels.add_child(new_widget)
-			var coords2D = tile_map_layer.to_global(tile_map_layer.map_to_local(cell_coordinates))
-			new_widget.set_global_position(coords2D)
-			tile_infos[tile.x][tile.y] = new_widget
-		is_odd_row = not is_odd_row
+	var sim_x = grid_pos.x
+	var sim_y = grid_pos.y * 2
+	
+	var center_tile = simulation.get_tile(sim_x, sim_y)
+	if center_tile == null:
+		center_tile = simulation.get_tile(sim_x, sim_y + 1)
+	
+	if center_tile != null:
+		var zone_coords = simulation.get_pattern_coordinates(center_tile.x, center_tile.y, current_pattern)
+		
+		for coords in zone_coords:
+			var cell_pos = Vector2i(coords[0], coords[1] / 2)
+			highlight_layer.set_cell(cell_pos, 0, Vector2i(0, 0)) 
+		
+		var pulse = (sin(Time.get_ticks_msec() * 0.003) + 1.0) / 2.0
+		highlight_layer.modulate = Color(15.0, 5.0, 0.0, 0.15 + (pulse * 0.4))
 
-# LOGIQUE DES BOUTONS (SATELLITES)
-
-func _on_btn_circle_pressed():
-	_start_placement(Satellite.Pattern.CIRCLE)
-
-func _on_btn_column_pressed():
-	_start_placement(Satellite.Pattern.COLUMN)
-
-func _on_btn_oval_pressed():
-	_start_placement(Satellite.Pattern.OVAL)
-
-func _on_btn_butterfly_pressed():
-	_start_placement(Satellite.Pattern.BUTTERFLY)
-
-func _start_placement(pattern: Satellite.Pattern):
-	is_placing_satellite = true
-	current_pattern = pattern
-	ghost.visible = true
-
-# MAGNÉTISME ET PLACEMENT
+# PLACEMENT ET MAGNÉTISME
 
 func update_satellite_ghost_position():
 	var mouse_pos = tile_map_layer.get_local_mouse_position()
@@ -89,7 +78,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func place_satellite_at_mouse():
 	var mouse_pos = tile_map_layer.get_local_mouse_position()
 	var grid_pos = tile_map_layer.local_to_map(mouse_pos)
-	
 	var sim_x = grid_pos.x
 	var sim_y = grid_pos.y * 2
 		
@@ -103,25 +91,37 @@ func place_satellite_at_mouse():
 		
 		is_placing_satellite = false
 		ghost.visible = false
+		if highlight_layer:
+			highlight_layer.clear()
 		print("Satellite fixé sur la case : ", tile.x, ";", tile.y)
 
-func _on_init_button_pressed() -> void:
-	simulation._init_board_16x9()
-	init_grid()
+# INITIALISATION ET MISE À JOUR VISUELLE
 
-func _on_print_button_pressed() -> void:
-	simulation.print_board()
-
-func _on_process_button_pressed() -> void:
-	simulation.process_board()
-
-func _on_display_grid_button_pressed() -> void:
+func init_grid():
+	tile_map_layer.clear()
+	for child in labels.get_children():
+		child.queue_free()
+	
+	tile_infos = []
+	tile_infos.resize(simulation.width)
+	for i in simulation.width:
+		tile_infos[i].resize(simulation.height)
+	
 	var is_odd_row = false
 	for y in simulation.height:
 		for x in range(1 if is_odd_row else 0, simulation.width, 2):
-			tile_infos[x][y].display_tile(simulation.get_tile(x, y))
+			var tile = simulation.get_tile(x, y)
+			var cell_coordinates = Vector2i(tile.x, tile.y/2)
+
+			tile_map_layer.set_cell(cell_coordinates, 0, Vector2i(4-tile.height, 0))
+			
+			var new_widget : TileInfo = tile_info_scene.instantiate()
+			labels.add_child(new_widget)
+			var coords2D = tile_map_layer.to_global(tile_map_layer.map_to_local(cell_coordinates))
+			new_widget.set_global_position(coords2D)
+			tile_infos[tile.x][tile.y] = new_widget
 		is_odd_row = not is_odd_row
-	
+
 func update_visuals():
 	var is_odd_row = false
 	for y in simulation.height:
@@ -131,11 +131,32 @@ func update_visuals():
 			
 			var info = tile_infos[x][y]
 			var cell_coords = Vector2i(tile.x, tile.y/2)
+			
 			var fog = tile.get_fog_level(simulation.current_turn)
-			var gray_value = 1.0 - (fog * 0.125)
+			var gray_value = 1.0 - (fog * 0.125) 
+			
 			info.modulate = Color(gray_value, gray_value, gray_value, 1.0)
 			info.display_tile(tile)
-			var alt_id = fog
-			tile_map_layer.set_cell(cell_coords, 0, Vector2i(4-tile.height, 0), alt_id)
+			
+			tile_map_layer.set_cell(cell_coords, 0, Vector2i(4-tile.height, 0), fog)
 				
 		is_odd_row = not is_odd_row
+
+# SIGNAUX UI
+
+func _on_btn_circle_pressed(): _start_placement(Satellite.Pattern.CIRCLE)
+func _on_btn_column_pressed(): _start_placement(Satellite.Pattern.COLUMN)
+func _on_btn_oval_pressed(): _start_placement(Satellite.Pattern.OVAL)
+func _on_btn_butterfly_pressed(): _start_placement(Satellite.Pattern.BUTTERFLY)
+
+func _start_placement(pattern: Satellite.Pattern):
+	is_placing_satellite = true
+	current_pattern = pattern
+	ghost.visible = true
+
+func _on_init_button_pressed():
+	simulation._init_board_16x9()
+	init_grid()
+
+func _on_print_button_pressed(): simulation.print_board()
+func _on_process_button_pressed(): simulation.process_board()

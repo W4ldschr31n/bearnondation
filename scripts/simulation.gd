@@ -81,6 +81,11 @@ func _init_with_board(board: Array[Tile], p_width: int, p_height: int) -> void:
 # LOGIQUE DES SATELLITES
 
 func place_satellite(x: int, y: int, pattern: Satellite.Pattern, interval: int):
+	for i in range(satellites.size() - 1, -1, -1):
+		if satellites[i].pattern_type == pattern:
+			satellites.remove_at(i)
+	
+	# Ajouter le nouveau satellite
 	var sat = Satellite.new(x, y, pattern, interval)
 	satellites.append(sat)
 	trigger_satellite(sat)
@@ -89,6 +94,7 @@ func advance_turn():
 	current_turn += 1
 	process_board()
 	
+	# Les zones sous les satellites restent à 0 de brouillard
 	for sat in satellites:
 		trigger_satellite(sat)
 	
