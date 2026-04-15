@@ -32,10 +32,11 @@ func is_flowing() -> bool:
 func send_flow(amount : int) -> int:
 	if(!is_filled()):
 		var fill_qty = min(max_filling - current_filling, amount)
+		current_filling += fill_qty
 		amount -= fill_qty
 	elif(!is_flowing()):
 		var flow_qty = min(max_flow - current_flow, amount)
-		amount -= flow_qty
+		current_flow += flow_qty
 	return amount
 
 static func NewLand():

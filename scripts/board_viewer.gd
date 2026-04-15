@@ -38,6 +38,8 @@ func init_grid():
 			new_widget.set_global_position(coords2D)
 			tile_infos[tile.x][tile.y] = new_widget
 		is_odd_row = not is_odd_row
+	
+	_on_display_grid_button_pressed()
 
 
 func _on_init_button_pressed() -> void:
@@ -51,6 +53,7 @@ func _on_print_button_pressed() -> void:
 
 func _on_process_button_pressed() -> void:
 	simulation.process_board()
+	_on_display_grid_button_pressed()
 
 
 func _on_display_grid_button_pressed() -> void:

@@ -5,4 +5,7 @@ extends Control
 
 
 func display_tile(tile: Tile):
-	label.text = str(tile.current_flow) + "/" + str(tile.max_flow)
+	if tile.current_flow==0:
+		label.text = str(tile.current_filling) + "/" + str(tile.max_filling) + "\n(Fill)"
+	else:
+		label.text = str(tile.current_flow) + "/" + str(tile.max_flow) + "\n(Flow)"

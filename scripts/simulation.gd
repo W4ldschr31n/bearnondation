@@ -6,6 +6,12 @@ var sources : Array
 var width: int
 var height: int
 
+# per run variables
+var tiles_to_check: Array
+var tiles_visited: Array
+var lowest_height: int
+var flow_to_unload: int
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Only if launched from editor directly
@@ -18,7 +24,7 @@ func _init_board_8x4():
 		[
 			Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(),
 				Tile.NewHill(), Tile.NewMountain(), Tile.NewMountain(), Tile.NewMountain(),
-			Tile.NewForest(), Tile.NewForest(), Tile.NewSource(200), Tile.NewForest(),
+			Tile.NewForest(), Tile.NewForest(), Tile.NewSource(50), Tile.NewForest(),
 				Tile.NewHill(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(),
 		],
 		# Width
@@ -111,40 +117,27 @@ func print_board():
 	print("\nIndex")
 	print_tiles_index()
 
+func foreach_tile(callback: Callable, filter: Callable):
+	var is_odd_row = false
+	for y in height:
+		for x in range(1 if is_odd_row else 0, width, 2):
+			var tile = get_tile(x, y)
+			if(filter.call(tile)):
+				callback.call(tile)
+		is_odd_row = not is_odd_row
 
 func trickle_down(source: Tile):
-	var flow_to_unload = source.current_flow
+	if (flow_to_unload==0):
+		return
+	print("Tile ", source.x, ";", source.y, " has ", flow_to_unload, " to unload")
+	flow_to_unload = source.send_flow(flow_to_unload)
+	
 	var source_neighbours = get_tile_neighbours(source)
-	source_neighbours.reverse()
-	var tiles_to_check = []
 	for n in source_neighbours:
 		var neighbour = get_tile(n[0], n[1])
-		if(neighbour.height == source.height-1 && neighbour.current_flow < neighbour.max_flow):
-			tiles_to_check.push_front(n)
-	var checked_tiles = [[source.x, source.y]]
-	while(flow_to_unload>0 and tiles_to_check.size()>0):
-		print(flow_to_unload)
-		var t_coordinates = tiles_to_check.pop_front()
-		var tile : Tile = tiles[t_coordinates[0]][t_coordinates[1]]
-		checked_tiles.push_back([tile.x, tile.y])
-		var unloadable_flow: int = min(flow_to_unload, tile.max_flow - tile.current_flow)
-		tile.current_flow += unloadable_flow
-		flow_to_unload -= unloadable_flow
-		var new_neighbours = get_tile_neighbours(tile)
-		# Neighbours must be added in reverse order
-		new_neighbours.reverse()
-		for n in new_neighbours:
-			var neighbour = get_tile(n[0], n[1])
-			if(
-				# Avoid duplicate checks
-				!checked_tiles.has(n) && !tiles_to_check.has(n)
-				# Only check if available
-			 	&& neighbour.height==tile.height-1 && neighbour.current_flow<neighbour.max_flow
-			):
-				tiles_to_check.push_front(n)
-	
-	if(flow_to_unload>0):
-		print("WATER OVERFLOW : ", flow_to_unload)
+		if(neighbour.height == source.height-1 || neighbour.height == lowest_height && !neighbour.is_flowing()):
+			trickle_down(neighbour)
+
 
 func get_tile(x, y) -> Tile:
 	return tiles[x][y]
@@ -176,10 +169,22 @@ func get_tile_neighbours(tile : Tile):
 
 func process_sources():
 	for coordinates in sources:
+		lowest_height = 0
 		var source : Tile = tiles[coordinates[0]][coordinates[1]]
-		trickle_down(source)
-		
+		flow_to_unload = source.current_flow
+		while flow_to_unload > 0 and lowest_height < source.height:
+			tiles_visited = []
+			tiles_to_check = []
+			trickle_down(source)
+			lowest_height += 1
+			print("Remaining flow : ", flow_to_unload)
+		print("Overflow : ", flow_to_unload)
+
+func reset_flow():
+	foreach_tile(func (tile: Tile): tile.current_flow = 0, func (tile: Tile): return not tile.is_source)
+
 func process_board():
+	reset_flow()
 	process_sources()
 
 func _on_step_timer_timeout() -> void:
