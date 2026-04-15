@@ -1,18 +1,17 @@
 class_name Tile
 extends Node
 
-# Coordinates
 var x : int
 var y : int
-# Type of tile
 var height : int
 var is_source : bool
-# Water filling
 var max_filling : int
 var current_filling : int
-# Water flowing
 var max_flow : int
 var current_flow : int
+
+# Brouillard de guerre
+var last_revealed_turn : int = 0
 
 func _init(height, is_source, filling, flow):
 	self.height = height
@@ -37,6 +36,10 @@ func send_flow(amount : int) -> int:
 		var flow_qty = min(max_flow - current_flow, amount)
 		amount -= flow_qty
 	return amount
+
+func get_fog_level(current_turn: int) -> int:
+	var turns_passed = current_turn - last_revealed_turn
+	return clampi(turns_passed, 0, 4)
 
 static func NewLand():
 	return Tile.new(0, false, 10, 10)

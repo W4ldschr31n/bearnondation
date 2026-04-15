@@ -8,6 +8,7 @@ anchors_preset = 0
 script = ExtResource("1_a08dn")
 
 [node name="Label" type="Label" parent="." unique_id=1935039479]
+modulate = Color(1.540184e-06, 0.75726, 0.7579775, 1)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
