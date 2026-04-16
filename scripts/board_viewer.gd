@@ -12,6 +12,10 @@ var tile_infos : Array[Array]
 var is_placing_satellite : bool = false
 var current_pattern : Satellite.Pattern = Satellite.Pattern.CIRCLE
 
+enum PlacementMode { SATELLITE, ACTION }
+var current_mode = PlacementMode.SATELLITE
+var current_action_type : Simulation.ActionType = Simulation.ActionType.BAIT
+
 func _ready() -> void:
 	add_to_group("viewer")
 	if simulation == null:
@@ -53,14 +57,26 @@ func update_preview_zone():
 		center_tile = simulation.get_tile(sim_x, sim_y + 1)
 	
 	if center_tile != null:
-		var zone_coords = simulation.get_pattern_coordinates(center_tile.x, center_tile.y, current_pattern)
+		var pattern_to_use = current_pattern
+		if current_mode == PlacementMode.ACTION:
+			pattern_to_use = Satellite.Pattern.CIRCLE
+			
+		var zone_coords = simulation.get_pattern_coordinates(center_tile.x, center_tile.y, pattern_to_use)
 		
 		for coords in zone_coords:
 			var cell_pos = Vector2i(coords[0], coords[1] / 2)
 			highlight_layer.set_cell(cell_pos, 0, Vector2i(0, 0)) 
 		
 		var pulse = (sin(Time.get_ticks_msec() * 0.003) + 1.0) / 2.0
-		highlight_layer.modulate = Color(15.0, 5.0, 0.0, 0.15 + (pulse * 0.4))
+		var alpha = 0.3 + (pulse * 0.4)
+		
+		if current_mode == PlacementMode.ACTION:
+			if current_action_type == Simulation.ActionType.BAIT:
+				highlight_layer.modulate = Color(0.0, 15.0, 0.0, alpha)
+			else:
+				highlight_layer.modulate = Color(15.0, 0.0, 0.0, alpha)
+		else:
+			highlight_layer.modulate = Color(15.0, 5.0, 0.0, alpha)
 
 # PLACEMENT ET MAGNÉTISME
 
@@ -80,20 +96,32 @@ func place_satellite_at_mouse():
 	var grid_pos = tile_map_layer.local_to_map(mouse_pos)
 	var sim_x = grid_pos.x
 	var sim_y = grid_pos.y * 2
-		
+	
 	var tile = simulation.get_tile(sim_x, sim_y)
-	if tile == null:
-		tile = simulation.get_tile(sim_x, sim_y + 1)
+	if tile == null: tile = simulation.get_tile(sim_x, sim_y + 1)
 	
 	if tile != null:
-		simulation.place_satellite(tile.x, tile.y, current_pattern, 3) 
-		update_visuals() 
+		if current_mode == PlacementMode.SATELLITE:
+			simulation.place_satellite(tile.x, tile.y, current_pattern, 3)
+		else:
+			simulation.place_action(tile.x, tile.y, current_action_type)
 		
 		is_placing_satellite = false
 		ghost.visible = false
-		if highlight_layer:
-			highlight_layer.clear()
-		print("Satellite fixé sur la case : ", tile.x, ";", tile.y)
+		ghost.modulate = Color.WHITE
+		if highlight_layer: highlight_layer.clear()
+
+func _start_action_placement(type: Simulation.ActionType):
+	is_placing_satellite = true 
+	current_mode = PlacementMode.ACTION
+	current_action_type = type
+	ghost.visible = true
+	
+	if type == Simulation.ActionType.BAIT:
+		ghost.modulate = Color.GREEN
+	else:
+		ghost.modulate = Color.RED
+	update_satellite_ghost_position()
 
 # INITIALISATION ET MISE À JOUR VISUELLE
 
@@ -112,7 +140,6 @@ func init_grid():
 		for x in range(1 if is_odd_row else 0, simulation.width, 2):
 			var tile = simulation.get_tile(x, y)
 			var cell_coordinates = Vector2i(tile.x, tile.y/2)
-
 			tile_map_layer.set_cell(cell_coordinates, 0, Vector2i(4-tile.height, 0))
 			
 			var new_widget : TileInfo = tile_info_scene.instantiate()
@@ -138,9 +165,26 @@ func update_visuals():
 			info.modulate = Color(gray_value, gray_value, gray_value, 1.0)
 			info.display_tile(tile)
 			
+			var action = simulation.get_action_at(tile.x, tile.y)
+			if action != null:
+				if action == Simulation.ActionType.BAIT:
+					info.label.text += "\n[APPÂT]"
+					info.modulate = Color(0.5, 1.0, 0.5, 1.0) 
+				elif action == Simulation.ActionType.REPELLENT:
+					info.label.text += "\n[REPOUSSE]"
+					info.modulate = Color(1.0, 0.5, 0.5, 1.0)
+
 			tile_map_layer.set_cell(cell_coords, 0, Vector2i(4-tile.height, 0), fog)
 				
 		is_odd_row = not is_odd_row
+	
+	_update_action_ui_labels()
+
+func _update_action_ui_labels():
+	if has_node("Buttons/BaitCount"):
+		get_node("Buttons/BaitCount").text = "x" + str(simulation.action_charges[Simulation.ActionType.BAIT])
+	if has_node("Buttons/RepellentCount"):
+		get_node("Buttons/RepellentCount").text = "x" + str(simulation.action_charges[Simulation.ActionType.REPELLENT])
 
 # SIGNAUX UI
 
@@ -148,11 +192,16 @@ func _on_btn_circle_pressed(): _start_placement(Satellite.Pattern.CIRCLE)
 func _on_btn_column_pressed(): _start_placement(Satellite.Pattern.COLUMN)
 func _on_btn_oval_pressed(): _start_placement(Satellite.Pattern.OVAL)
 func _on_btn_butterfly_pressed(): _start_placement(Satellite.Pattern.BUTTERFLY)
+func _on_btn_bait_pressed(): _start_action_placement(Simulation.ActionType.BAIT)
+func _on_btn_repellent_pressed(): _start_action_placement(Simulation.ActionType.REPELLENT)
 
 func _start_placement(pattern: Satellite.Pattern):
 	is_placing_satellite = true
+	current_mode = PlacementMode.SATELLITE
 	current_pattern = pattern
 	ghost.visible = true
+	ghost.modulate = Color.WHITE
+	update_satellite_ghost_position()
 
 func _on_init_button_pressed():
 	simulation._init_board_16x9()

@@ -112,7 +112,7 @@ custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "DisplayGrid"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Buttons" unique_id=370128850]
+[node name="HBoxContainerSatellite" type="HBoxContainer" parent="Buttons" unique_id=370128850]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -126,28 +126,28 @@ offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="SatelliteButton circle" type="Button" parent="Buttons/HBoxContainer" unique_id=100041873]
+[node name="SatelliteButton circle" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=100041873]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Satellite
 Patern
 circle"
 
-[node name="SatelliteButton oval" type="Button" parent="Buttons/HBoxContainer" unique_id=445032683]
+[node name="SatelliteButton oval" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=445032683]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Satellite
 Paterne
 oval"
 
-[node name="SatelliteButton column" type="Button" parent="Buttons/HBoxContainer" unique_id=23254623]
+[node name="SatelliteButton column" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=23254623]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Satellite
 Paterne
 column"
 
-[node name="SatelliteButton butterfly" type="Button" parent="Buttons/HBoxContainer" unique_id=583112244]
+[node name="SatelliteButton butterfly" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=583112244]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Satellite
@@ -160,6 +160,23 @@ offset_left = 985.0
 offset_top = 5.0
 offset_right = 1025.0
 offset_bottom = 28.0
+
+[node name="HBoxContainerItems" type="HBoxContainer" parent="Buttons" unique_id=1827117754]
+layout_mode = 0
+offset_left = 950.0
+offset_top = 500.0
+offset_right = 1154.0
+offset_bottom = 650.0
+
+[node name="BaitButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=185603280]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "  Bait  "
+
+[node name="RepelButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=495193646]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Repel"
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=248759777]
 position = Vector2(325, 150)
@@ -193,7 +210,9 @@ compositor = SubResource("Compositor_s2vfw")
 [connection signal="pressed" from="Buttons/VBoxContainer/ProcessButton" to="." method="_on_process_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/PrintButton" to="." method="_on_print_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/DisplayGridButton" to="." method="_on_display_grid_button_pressed"]
-[connection signal="pressed" from="Buttons/HBoxContainer/SatelliteButton circle" to="." method="_on_btn_circle_pressed"]
-[connection signal="pressed" from="Buttons/HBoxContainer/SatelliteButton oval" to="." method="_on_btn_oval_pressed"]
-[connection signal="pressed" from="Buttons/HBoxContainer/SatelliteButton column" to="." method="_on_btn_column_pressed"]
-[connection signal="pressed" from="Buttons/HBoxContainer/SatelliteButton butterfly" to="." method="_on_btn_butterfly_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton circle" to="." method="_on_btn_circle_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton oval" to="." method="_on_btn_oval_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton column" to="." method="_on_btn_column_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton butterfly" to="." method="_on_btn_butterfly_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerItems/BaitButton" to="." method="_on_btn_bait_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerItems/RepelButton" to="." method="_on_btn_repellent_pressed"]

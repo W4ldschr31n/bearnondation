@@ -25,6 +25,15 @@ func _ready() -> void:
 	if get_tree().current_scene == self:
 		_self_init()
 
+enum ActionType { BAIT, REPELLENT }
+
+var active_actions : Dictionary = {}
+
+var action_charges : Dictionary = {
+	ActionType.BAIT: 3,
+	ActionType.REPELLENT: 2
+}
+
 func _self_init():
 	_init_board_16x9()
 	print("--- Plateau 16x9 Initialisé ---")
@@ -85,7 +94,6 @@ func place_satellite(x: int, y: int, pattern: Satellite.Pattern, interval: int):
 		if satellites[i].pattern_type == pattern:
 			satellites.remove_at(i)
 	
-	# Ajouter le nouveau satellite
 	var sat = Satellite.new(x, y, pattern, interval)
 	satellites.append(sat)
 	trigger_satellite(sat)
@@ -94,7 +102,6 @@ func advance_turn():
 	current_turn += 1
 	process_board()
 	
-	# Les zones sous les satellites restent à 0 de brouillard
 	for sat in satellites:
 		trigger_satellite(sat)
 	
@@ -215,3 +222,18 @@ func get_tile_neighbours(tile : Tile):
 
 func _on_step_timer_timeout() -> void:
 	advance_turn()
+
+func place_action(x: int, y: int, type: ActionType):
+	if action_charges[type] > 0:
+		active_actions[str(x) + "," + str(y)] = type
+		action_charges[type] -= 1
+		print("Action placée: ", type, " Charges restantes: ", action_charges[type])
+		
+		var viewer = get_tree().get_first_node_in_group("viewer")
+		if viewer: viewer.update_visuals()
+	else:
+		print("Plus de charges pour cette action !")
+
+func get_action_at(x: int, y: int):
+	var key = str(x) + "," + str(y)
+	return active_actions.get(key, null)
