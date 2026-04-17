@@ -39,6 +39,11 @@ func send_flow(amount : int) -> int:
 		current_flow += flow_qty
 	return amount
 
+func flood():
+	self.height = 4
+	self.current_filling = self.max_filling
+	self.current_flow = self.max_flow
+
 static func NewLand():
 	return Tile.new(0, false, 10, 10)
 

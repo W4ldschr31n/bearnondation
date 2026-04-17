@@ -9,3 +9,6 @@ func display_tile(tile: Tile):
 		label.text = str(tile.current_filling) + "/" + str(tile.max_filling) + "\n(Fill)"
 	else:
 		label.text = str(tile.current_flow) + "/" + str(tile.max_flow) + "\n(Flow)"
+
+func display_flood():
+	label.text = "FLOOD"

@@ -1,14 +1,19 @@
 class_name Simulation
 extends Node
 
+# board
 var tiles : Array[Array]
 var sources : Array
 var width: int
 var height: int
+var current_turn: int = 0
+
+# flood
+@export var turns_before_flood_starts: int = 1
+@export var turns_between_flood_advances: int = 2
+var current_flood_x: int = -1
 
 # per run variables
-var tiles_to_check: Array
-var tiles_visited: Array
 var lowest_height: int
 var flow_to_unload: int
 
@@ -46,6 +51,8 @@ func _init_with_board(board: Array[Tile], width, height) -> void:
 	var is_odd_row = false
 	self.width = width
 	self.height = height
+	self.current_flood_x = -1
+	self.current_turn = 0
 	
 	# Init empty tiles
 	tiles = []
@@ -173,19 +180,30 @@ func process_sources():
 		var source : Tile = tiles[coordinates[0]][coordinates[1]]
 		flow_to_unload = source.current_flow
 		while flow_to_unload > 0 and lowest_height < source.height:
-			tiles_visited = []
-			tiles_to_check = []
 			trickle_down(source)
 			lowest_height += 1
 			print("Remaining flow : ", flow_to_unload)
 		print("Overflow : ", flow_to_unload)
 
 func reset_flow():
-	foreach_tile(func (tile: Tile): tile.current_flow = 0, func (tile: Tile): return not tile.is_source)
+	foreach_tile(func (tile: Tile): tile.current_flow = 0, func (tile: Tile): return not tile.is_source && tile.x > current_flood_x)
+
+func process_flood():
+	if(
+		current_turn >= turns_before_flood_starts
+		&& ((turns_before_flood_starts-current_turn) % turns_between_flood_advances) == 0
+	):
+		flood_advance()
+
+func flood_advance():
+	current_flood_x += 1
+	foreach_tile(func(tile: Tile): tile.flood(), func(tile: Tile): return tile.x==current_flood_x)
 
 func process_board():
 	reset_flow()
 	process_sources()
+	process_flood()
+	current_turn += 1
 
 func _on_step_timer_timeout() -> void:
 	# Process the board
