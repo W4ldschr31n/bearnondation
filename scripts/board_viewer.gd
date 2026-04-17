@@ -38,6 +38,8 @@ func init_grid():
 			new_widget.set_global_position(coords2D)
 			tile_infos[tile.x][tile.y] = new_widget
 		is_odd_row = not is_odd_row
+	
+	_on_display_grid_button_pressed()
 
 
 func _on_init_button_pressed() -> void:
@@ -51,12 +53,17 @@ func _on_print_button_pressed() -> void:
 
 func _on_process_button_pressed() -> void:
 	simulation.process_board()
+	_on_display_grid_button_pressed()
 
 
 func _on_display_grid_button_pressed() -> void:
 	var is_odd_row = false
 	for y in simulation.height:
 		for x in range(1 if is_odd_row else 0, simulation.width, 2):
-			tile_infos[x][y].display_tile(simulation.get_tile(x, y))
+			if(simulation.current_flood_x<x):
+				tile_infos[x][y].display_tile(simulation.get_tile(x, y))
+			else:
+				tile_infos[x][y].display_flood()
+				tile_map_layer.set_cell(Vector2i(x, y/2), 0, Vector2i(0, 0))
 		is_odd_row = not is_odd_row
 	
