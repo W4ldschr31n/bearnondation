@@ -13,4 +13,5 @@ turn_duration = 5.0
 simulation = NodePath("../Simulation")
 animals = NodePath("../Animals")
 
-[node name="Animals" parent="." unique_id=1753553358 instance=ExtResource("3_c6dvc")]
+[node name="Animals" parent="." unique_id=1753553358 node_paths=PackedStringArray("SimulationRef") instance=ExtResource("3_c6dvc")]
+SimulationRef = NodePath("../Simulation")

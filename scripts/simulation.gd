@@ -73,13 +73,45 @@ func _self_init():
 	print_board()
 
 func _init_with_board(board: Array[Tile], width, height) -> void:
-	#var current_x = 0
-	#var current_y = 0
-	#var is_odd_row = false
+	var current_x = 0
+	var current_y = 0
+	var is_odd_row = false
 	self.width = width
 	self.height = height
 	self.current_flood_x = -1
 	self.current_turn = 0
+	
+	# Init empty tiles
+	tiles = []
+	tiles.resize(width)
+	for i in width:
+		tiles[i].resize(height)
+	sources = []
+	
+	# Check size matches
+	var expected_size = width * height/2
+	if(board.size() < expected_size):
+		printerr("Not enough tiles to init")
+		return
+	elif(board.size() > expected_size):
+		printerr("Too much tiles")
+		return
+	
+	# Read board
+	for t in board:
+		# Record tile
+		t.x = current_x
+		t.y = current_y
+		if(t.is_source):
+			sources.append([current_x, current_y])
+		tiles[current_x][current_y] = t
+			
+		# Update index
+		current_x += 2
+		if(current_x >= width):
+			is_odd_row = not is_odd_row
+			current_x = 1 if is_odd_row else 0
+			current_y += 1
 
 func _init_board_16x9():
 	var board: Array[Tile] = []
@@ -225,8 +257,6 @@ func print_tiles_heights():
 
 func get_tile(x: int, y: int) -> Tile:
 	if x < 0 or x >= width or y < 0 or y >= height: return null
-	print(width, " is width")
-	print(tiles, " is tiles")
 	return tiles[x][y]
 
 func get_tile_neighbours(tile : Tile):

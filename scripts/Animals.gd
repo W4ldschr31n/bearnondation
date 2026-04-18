@@ -23,19 +23,26 @@ func Move() -> void:
 				break
 	else :
 		#should get the best bait
-		var Bait = SimulationRef.baits[0]
+		var baited_case : Tile
+		for line_to_check in SimulationRef.tiles :
+			if (line_to_check != []):
+				for tile_to_check : Tile in line_to_check :
+					if(tile_to_check != null):
+						print(tile_to_check.name, " is tile to check")
+						if(SimulationRef.get_action_at(tile_to_check.x, tile_to_check.y) == SimulationRef.ActionType.BAIT):
+							baited_case = SimulationRef.get_tile(tile_to_check.x, tile_to_check.y)
 		var bait_direction : int
-		if(Bait.y < y) : # Bait is higher than the animals
-			if(Bait.x < x) :
+		if(baited_case.y < y) : # Bait is higher than the animals
+			if(baited_case.x < x) :
 				bait_direction = 5 #North West
-			elif (Bait.x > x) :
+			elif (baited_case.x > x) :
 				bait_direction = 4 #North East
 			else :
 				bait_direction = 3 #North
 		else : # Bait is lower than the animals
-			if(Bait.x < x) :
+			if(baited_case.x < x) :
 				bait_direction = 2 #South West
-			elif (Bait.x > x) :
+			elif (baited_case.x > x) :
 				bait_direction = 1 #South East
 			else :
 				bait_direction = 0 #South
@@ -62,14 +69,24 @@ func Move() -> void:
 				print("Error : can't move")
 	x = target_coordinates[0]
 	y = target_coordinates[1]
+	if (SimulationRef.get_action_at(x, y) == SimulationRef.ActionType.BAIT):
+		#enlever l'appat
+		pass
 	moved.emit()
 
 # should return -1 if no bait, or the id of the neigbor case baited
 func LookForABait() -> bool:
 	# should get a bait from simulation list referencing baits put on board
-	if (SimulationRef.baits == []):
-		return false
-	return true
+	#if (SimulationRef.baits == []):
+		#return false
+	for line_to_check in SimulationRef.tiles :
+		if (line_to_check != []):
+			for tile_to_check : Tile in line_to_check :
+				if(tile_to_check != null):
+					print(tile_to_check.name, " is tile to check")
+					if(SimulationRef.get_action_at(tile_to_check.x, tile_to_check.y) == SimulationRef.ActionType.BAIT):
+						return true
+	return false
 
 func _on_timer_timeout() -> void:
 	Move()
