@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dqeptxqai5sm3"]
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=2017465013]
+motion_mode = 1
+platform_on_leave = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1099281475]
