@@ -21,7 +21,6 @@ var lowest_height: int
 var flow_to_unload: int
 
 # Gestion des tours et satellites
-var current_turn : int = 0
 var turn_timer : Timer
 @export var turn_duration : float = 15.0
 var satellites : Array[Satellite] = []
@@ -66,15 +65,17 @@ var action_charges : Dictionary = {
 }
 
 func _self_init():
-	_init_board_16x9()
-	print("--- Plateau 16x9 Initialisé ---")
+	_init_board_8x4()
+	print("--- Plateau 8x4 Initialisé ---")
+	#_init_board_16x9()
+	#print("--- Plateau 16x9 Initialisé ---")
 	process_board()
 	print_board()
 
 func _init_with_board(board: Array[Tile], width, height) -> void:
-	var current_x = 0
-	var current_y = 0
-	var is_odd_row = false
+	#var current_x = 0
+	#var current_y = 0
+	#var is_odd_row = false
 	self.width = width
 	self.height = height
 	self.current_flood_x = -1
@@ -94,38 +95,6 @@ func _init_board_16x9():
 			board.append(Tile.NewHill())
 			
 	_init_with_board(board, 16, 9)
-
-func _init_with_board(board: Array[Tile], p_width: int, p_height: int) -> void:
-	self.width = p_width
-	self.height = p_height
-	
-	var expected_size = (width * height) / 2
-	if board.size() != expected_size:
-		printerr("Erreur : Taille du tableau incorrecte.")
-		return
-
-	tiles = []
-	tiles.resize(width)
-	for i in width:
-		tiles[i].resize(height)
-	sources = []
-	
-	var current_x = 0
-	var current_y = 0
-	var is_odd_row = false
-	
-	for t in board:
-		t.x = current_x
-		t.y = current_y
-		if t.is_source:
-			sources.append([current_x, current_y])
-		tiles[current_x][current_y] = t
-			
-		current_x += 2
-		if current_x >= width:
-			is_odd_row = !is_odd_row
-			current_x = 1 if is_odd_row else 0
-			current_y += 1
 
 # LOGIQUE DES SATELLITES
 
@@ -200,14 +169,6 @@ func foreach_tile(callback: Callable, filter: Callable):
 				callback.call(tile)
 		is_odd_row = not is_odd_row
 
-func process_board():
-	process_sources()
-
-func process_sources():
-	for coordinates in sources:
-		var source : Tile = tiles[coordinates[0]][coordinates[1]]
-		trickle_down(source)s
-
 func trickle_down(source: Tile):
 	if (flow_to_unload==0):
 		return
@@ -223,25 +184,26 @@ func trickle_down(source: Tile):
 			trickle_down(neighbour)
 
 # version from sattelite
-		if neighbour and neighbour.height == source.height-1:
-			tiles_to_check.push_front(n)
-			
-	var checked_tiles = [[source.x, source.y]]
-	while flow_to_unload > 0 and tiles_to_check.size() > 0:
-		var t_coordinates = tiles_to_check.pop_front()
-		var tile : Tile = tiles[t_coordinates[0]][t_coordinates[1]]
-		checked_tiles.push_back([tile.x, tile.y])
-		
-		var unloadable_flow: int = min(flow_to_unload, tile.max_flow - tile.current_flow)
-		tile.current_flow += unloadable_flow
-		flow_to_unload -= unloadable_flow
-		
-		var new_neighbours = get_tile_neighbours(tile)
-		new_neighbours.reverse()
-		for n in new_neighbours:
-			var neighbour = get_tile(n[0], n[1])
-			if neighbour and !checked_tiles.has(n) and !tiles_to_check.has(n) and neighbour.height == tile.height-1:
-				tiles_to_check.push_front(n)
+		#if neighbour and neighbour.height == source.height-1:
+			#tiles_to_check.push_front(n)
+			#
+	#var checked_tiles = [[source.x, source.y]]
+	#while flow_to_unload > 0 and tiles_to_check.size() > 0:
+		#var t_coordinates = tiles_to_check.pop_front()
+		#var tile : Tile = tiles[t_coordinates[0]][t_coordinates[1]]
+		#checked_tiles.push_back([tile.x, tile.y])
+		#
+		#var unloadable_flow: int = min(flow_to_unload, tile.max_flow - tile.current_flow)
+		#tile.current_flow += unloadable_flow
+		#flow_to_unload -= unloadable_flow
+		#
+		#var new_neighbours = get_tile_neighbours(tile)
+		#new_neighbours.reverse()
+		#for n in new_neighbours:
+			#var neighbour = get_tile(n[0], n[1])
+			#if neighbour and !checked_tiles.has(n) and !tiles_to_check.has(n) and neighbour.height == tile.height-1:
+				#tiles_to_check.push_front(n)
+
 
 # DEBUG
 
@@ -263,6 +225,8 @@ func print_tiles_heights():
 
 func get_tile(x: int, y: int) -> Tile:
 	if x < 0 or x >= width or y < 0 or y >= height: return null
+	print(width, " is width")
+	print(tiles, " is tiles")
 	return tiles[x][y]
 
 func get_tile_neighbours(tile : Tile):
@@ -307,10 +271,6 @@ func process_board():
 	process_sources()
 	process_flood()
 	current_turn += 1
-
-func _on_step_timer_timeout() -> void:
-	# Process the board
-	pass
 
 
 func _on_animals_moved() -> void:

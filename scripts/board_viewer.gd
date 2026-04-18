@@ -158,6 +158,9 @@ func _on_init_button_pressed() -> void:
 	simulation._init_board_8x4()
 	init_grid()
 
+#func _on_init_button_pressed():
+	#simulation._init_board_16x9()
+	#init_grid()
 
 func _on_print_button_pressed() -> void:
 	simulation.print_board()
@@ -166,7 +169,6 @@ func _on_print_button_pressed() -> void:
 func _on_process_button_pressed() -> void:
 	simulation.process_board()
 	_on_display_grid_button_pressed()
-
 
 func _on_display_grid_button_pressed() -> void:
 	var is_odd_row = false
@@ -238,10 +240,3 @@ func _start_placement(pattern: Satellite.Pattern):
 	ghost.visible = true
 	ghost.modulate = Color.WHITE
 	update_satellite_ghost_position()
-
-func _on_init_button_pressed():
-	simulation._init_board_16x9()
-	init_grid()
-
-func _on_print_button_pressed(): simulation.print_board()
-func _on_process_button_pressed(): simulation.process_board()

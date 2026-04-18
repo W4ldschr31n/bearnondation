@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://ryj7jfph01dn"]
+
+[ext_resource type="PackedScene" uid="uid://dpyp4pft5p31f" path="res://scenes/simulation.tscn" id="1_ibiss"]
+[ext_resource type="PackedScene" uid="uid://b25qbw3gewhaq" path="res://scenes/board_viewer.tscn" id="2_c6dvc"]
+[ext_resource type="PackedScene" uid="uid://dqeptxqai5sm3" path="res://scenes/Animals.tscn" id="3_c6dvc"]
+
+[node name="MainScene" type="Node" unique_id=706600767]
+
+[node name="Simulation" parent="." unique_id=660034502 instance=ExtResource("1_ibiss")]
+turn_duration = 5.0
+
+[node name="BoardViewer" parent="." unique_id=618590062 node_paths=PackedStringArray("simulation", "animals") instance=ExtResource("2_c6dvc")]
+simulation = NodePath("../Simulation")
+animals = NodePath("../Animals")
+
+[node name="Animals" parent="." unique_id=1753553358 instance=ExtResource("3_c6dvc")]
