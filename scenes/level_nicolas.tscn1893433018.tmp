@@ -6,7 +6,5 @@
 [node name="LevelNicolas" type="Node" unique_id=706600767]
 
 [node name="Simulation" parent="." unique_id=660034502 instance=ExtResource("1_qeeff")]
-turn_duration = 5.0
 
-[node name="BoardViewer" parent="." unique_id=618590062 node_paths=PackedStringArray("simulation") instance=ExtResource("2_ond22")]
-simulation = NodePath("../Simulation")
+[node name="BoardViewer" parent="." unique_id=618590062 instance=ExtResource("2_ond22")]

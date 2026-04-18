@@ -2,21 +2,77 @@
 
 [ext_resource type="Script" uid="uid://cx7qh7bbx18iq" path="res://scripts/board_viewer.gd" id="1_co73x"]
 [ext_resource type="Texture2D" uid="uid://gilphs47c24f" path="res://textures/hexa_tilemap.png" id="2_t7b7u"]
+[ext_resource type="Texture2D" uid="uid://iwob5lw78dun" path="res://textures/satellite.png" id="3_jyyrd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jyyrd"]
 texture = ExtResource("2_t7b7u")
 texture_region_size = Vector2i(64, 64)
+0:0/next_alternative_id = 5
 0:0/0 = 0
+0:0/1 = 1
+0:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
+0:0/2 = 2
+0:0/2/modulate = Color(0.6419357, 0.6419357, 0.6419357, 1)
+0:0/3 = 3
+0:0/3/modulate = Color(0.4595157, 0.4595157, 0.4595157, 1)
+0:0/4 = 4
+0:0/4/modulate = Color(0.3320306, 0.3320306, 0.3320306, 1)
+1:0/next_alternative_id = 5
 1:0/0 = 0
+1:0/1 = 1
+1:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
+1:0/2 = 2
+1:0/2/modulate = Color(0.64705884, 0.64705884, 0.64705884, 1)
+1:0/3 = 3
+1:0/3/modulate = Color(0.5294118, 0.5294118, 0.5294118, 1)
+1:0/4 = 4
+1:0/4/modulate = Color(0.4595157, 0.4595157, 0.4595157, 1)
+2:0/next_alternative_id = 5
 2:0/0 = 0
+2:0/1 = 1
+2:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
+2:0/2 = 2
+2:0/2/modulate = Color(0.64705884, 0.64705884, 0.64705884, 1)
+2:0/3 = 3
+2:0/3/modulate = Color(0.627451, 0.627451, 0.627451, 1)
+2:0/4 = 4
+2:0/4/modulate = Color(0.46316415, 0.46316415, 0.46316415, 1)
+3:0/next_alternative_id = 5
 3:0/0 = 0
+3:0/1 = 1
+3:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
+3:0/2 = 2
+3:0/2/modulate = Color(0.6419357, 0.6419357, 0.6419357, 1)
+3:0/3 = 3
+3:0/3/modulate = Color(0.4595157, 0.4595157, 0.4595157, 1)
+3:0/4 = 4
+3:0/4/modulate = Color(0.3320306, 0.3320306, 0.3320306, 1)
+4:0/next_alternative_id = 5
 4:0/0 = 0
+4:0/1 = 1
+4:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
+4:0/2 = 2
+4:0/2/modulate = Color(0.6419357, 0.6419357, 0.6419357, 1)
+4:0/3 = 3
+4:0/3/modulate = Color(0.4595157, 0.4595157, 0.4595157, 1)
+4:0/4 = 4
+4:0/4/modulate = Color(0.3320306, 0.3320306, 0.3320306, 1)
 
 [sub_resource type="TileSet" id="TileSet_p5xr7"]
 tile_shape = 3
 tile_offset_axis = 1
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_jyyrd")
+
+[sub_resource type="Environment" id="Environment_jyyrd"]
+glow_enabled = true
+glow_intensity = 1.5
+glow_bloom = 0.35
+glow_blend_mode = 0
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_p5xr7"]
+
+[sub_resource type="Compositor" id="Compositor_s2vfw"]
 
 [node name="BoardViewer" type="Node" unique_id=618590062]
 script = ExtResource("1_co73x")
@@ -56,10 +112,82 @@ custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "DisplayGrid"
 
+[node name="HBoxContainerSatellite" type="HBoxContainer" parent="Buttons" unique_id=370128850]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 287.5
+offset_top = -148.0
+offset_right = 587.5
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="SatelliteButton circle" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=100041873]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+text = "Satellite
+Patern
+circle"
+
+[node name="SatelliteButton oval" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=445032683]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+text = "Satellite
+Paterne
+oval"
+
+[node name="SatelliteButton column" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=23254623]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+text = "Satellite
+Paterne
+column"
+
+[node name="SatelliteButton butterfly" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=583112244]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+text = "Satellite
+Paterne
+butterfly"
+
+[node name="TimerLabel" type="Label" parent="Buttons" unique_id=415261863]
+layout_mode = 0
+offset_left = 985.0
+offset_top = 5.0
+offset_right = 1025.0
+offset_bottom = 28.0
+
+[node name="HBoxContainerItems" type="HBoxContainer" parent="Buttons" unique_id=1827117754]
+layout_mode = 0
+offset_left = 950.0
+offset_top = 500.0
+offset_right = 1154.0
+offset_bottom = 650.0
+
+[node name="BaitButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=185603280]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "  Bait  "
+
+[node name="RepelButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=495193646]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Repel"
+
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=248759777]
-position = Vector2(488, 149)
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+position = Vector2(325, 150)
+tile_map_data = PackedByteArray(0, 0, 255, 255, 251, 255, 0, 0, 0, 0, 0, 0, 0, 0)
 tile_set = SubResource("TileSet_p5xr7")
+
+[node name="HighlightLayer" type="TileMapLayer" parent="." unique_id=1452710280]
+z_index = 1
+position = Vector2(325, 150)
+tile_set = SubResource("TileSet_p5xr7")
+y_sort_origin = -1
 
 [node name="TileMarkers" type="Node2D" parent="." unique_id=1993501411]
 
@@ -74,7 +202,22 @@ z_index = 1
 position = Vector2(488, 149)
 tile_set = SubResource("TileSet_p5xr7")
 
+[node name="SatelliteGhost" type="Sprite2D" parent="." unique_id=450981833]
+modulate = Color(1, 1, 1, 0.49019608)
+texture = ExtResource("3_jyyrd")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1508050742]
+environment = SubResource("Environment_jyyrd")
+camera_attributes = SubResource("CameraAttributesPractical_p5xr7")
+compositor = SubResource("Compositor_s2vfw")
+
 [connection signal="pressed" from="Buttons/VBoxContainer/InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/ProcessButton" to="." method="_on_process_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/PrintButton" to="." method="_on_print_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/DisplayGridButton" to="." method="_on_display_grid_button_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton circle" to="." method="_on_btn_circle_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton oval" to="." method="_on_btn_oval_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton column" to="." method="_on_btn_column_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerSatellite/SatelliteButton butterfly" to="." method="_on_btn_butterfly_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerItems/BaitButton" to="." method="_on_btn_bait_pressed"]
+[connection signal="pressed" from="Buttons/HBoxContainerItems/RepelButton" to="." method="_on_btn_repellent_pressed"]
