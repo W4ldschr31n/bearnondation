@@ -69,6 +69,11 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="TileMapLayerAnimals" type="TileMapLayer" parent="." unique_id=1263514585]
+z_index = 1
+position = Vector2(488, 149)
+tile_set = SubResource("TileSet_p5xr7")
+
 [connection signal="pressed" from="Buttons/VBoxContainer/InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/ProcessButton" to="." method="_on_process_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/PrintButton" to="." method="_on_print_button_pressed"]

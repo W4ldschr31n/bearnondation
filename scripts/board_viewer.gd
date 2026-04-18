@@ -1,15 +1,16 @@
 extends Node
 
 @export var simulation: Simulation
+@export var animals: Animals
 @onready var tile_map_layer: TileMapLayer = $TileMapLayer
+@onready var tile_map_layer_animals: TileMapLayer = $TileMapLayerAnimals
 @onready var labels: Control = $Labels
 var tile_info_scene = preload("res://scenes/TileInfo.tscn")
 var tile_infos : Array[Array]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
-
+	animals.moved.connect(_on_display_grid_button_pressed) # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -66,4 +67,9 @@ func _on_display_grid_button_pressed() -> void:
 				tile_infos[x][y].display_flood()
 				tile_map_layer.set_cell(Vector2i(x, y/2), 0, Vector2i(0, 0))
 		is_odd_row = not is_odd_row
-	
+	tile_map_layer_animals.clear()
+	tile_map_layer_animals.set_cell(Vector2i(animals.x, animals.y/2), 0, Vector2i(4, 0))
+
+
+func _on_animals_moved() -> void:
+	_on_display_grid_button_pressed() # Replace with function body.

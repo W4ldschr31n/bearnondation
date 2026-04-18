@@ -1,7 +1,14 @@
 [gd_scene format=3 uid="uid://dqeptxqai5sm3"]
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=2017465013]
-motion_mode = 1
-platform_on_leave = 2
+[ext_resource type="Script" uid="uid://dc6pr3r0fabx" path="res://scripts/Animals.gd" id="1_24gem"]
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1099281475]
+[node name="Animals" type="Node2D" unique_id=1753553358]
+script = ExtResource("1_24gem")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=608678796]
+
+[node name="Timer" type="Timer" parent="." unique_id=1392456350]
+wait_time = 5.418
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

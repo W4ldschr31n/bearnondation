@@ -13,6 +13,9 @@ var current_turn: int = 0
 @export var turns_between_flood_advances: int = 2
 var current_flood_x: int = -1
 
+# animals
+var baits = []
+
 # per run variables
 var lowest_height: int
 var flow_to_unload: int
@@ -22,6 +25,7 @@ func _ready() -> void:
 	# Only if launched from editor directly
 	if get_tree().current_scene == self:
 		_self_init()
+		
 	
 func _init_board_8x4():
 	_init_with_board(
@@ -173,7 +177,7 @@ func get_tile_neighbours(tile : Tile):
 			neighbours.push_back([tile.x+1, tile.y-1])
 			
 	return neighbours
-
+	
 func process_sources():
 	for coordinates in sources:
 		lowest_height = 0
@@ -208,3 +212,7 @@ func process_board():
 func _on_step_timer_timeout() -> void:
 	# Process the board
 	pass
+
+
+func _on_animals_moved() -> void:
+	pass # Replace with function body.

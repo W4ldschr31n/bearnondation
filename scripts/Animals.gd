@@ -1,63 +1,76 @@
+class_name Animals
 extends Node
 
-var MyScriptTile = load("res://Tile.gd")
-var MyTile = MyScriptTile.new()
-var SimulationRef = load("res://scripts/simulation.gd")
-var MainSimulation = SimulationRef.new()
-var Bait = Object
+signal moved
+
+@export var SimulationRef : Simulation
+@export var x : int
+@export var y : int
+
+var MyTile : Tile
 var TimeBeforMoving = 0.0
 const TimeToMove = 10.0
 
 # move if possible, if a bait exists then toward it, else call the end of the game
 func Move() -> void:
-	var targetCase = randi_range(0, 5)
+	MyTile = SimulationRef.get_tile(x, y)
+	var target_coordinates = [x,y]
 	if(LookForABait() == false):
-		for i in range (10000):
-			if(true):
-				targetCase = randi_range(0, 5)
-			else :
-				Die()
+		for coordinates : Array in SimulationRef.get_tile_neighbours(MyTile):
+			var tile_to_check : Tile = SimulationRef.get_tile(coordinates[0], coordinates[1])
+			if(tile_to_check.is_filled() == false):
+				target_coordinates = coordinates
+				break
 	else :
-		if(Bait.transform.y < self.transform) : # Bait is higher than the animals
-			if(Bait.transform.x < self.transform) :
-				targetCase = 5 #North West
-			elif (Bait.transform.x > self.transform) :
-				targetCase = 4 #North East
+		#should get the best bait
+		var Bait = SimulationRef.baits[0]
+		var bait_direction : int
+		if(Bait.y < y) : # Bait is higher than the animals
+			if(Bait.x < x) :
+				bait_direction = 5 #North West
+			elif (Bait.x > x) :
+				bait_direction = 4 #North East
 			else :
-				targetCase = 3 #North
+				bait_direction = 3 #North
 		else : # Bait is lower than the animals
-			if(Bait.transform.x < self.transform) :
-				targetCase = 2 #South West
-			elif (Bait.transform.x > self.transform) :
-				targetCase = 1 #South East
+			if(Bait.x < x) :
+				bait_direction = 2 #South West
+			elif (Bait.x > x) :
+				bait_direction = 1 #South East
 			else :
-				targetCase = 0 #South
-	self.transform = SimulationRef.get_tiles_neighbours(MyTile)[targetCase].transform
-	MyTile.AnimalsOn = false
-	SimulationRef.get_tiles_neighbours(MyTile)[targetCase].AnimalsOn = true
-	MyTile = SimulationRef.get_tiles_neighbours(MyTile)[targetCase]
-
-	pass
+				bait_direction = 0 #South
+		var neighbour_direction : int
+		for coordinates : Array in (SimulationRef.get_tile_neighbours(MyTile)):
+			if(coordinates[1] < y) : # Bait is higher than the animals
+				if(coordinates[0] < x) :
+					neighbour_direction = 5 #North West
+				elif (coordinates[0] > x) :
+					neighbour_direction = 4 #North East
+				else :
+					neighbour_direction = 3 #North
+			else : # Bait is lower than the animals
+				if(coordinates[0] < x) :
+					neighbour_direction = 2 #South West
+				elif (coordinates[0] > x) :
+					neighbour_direction = 1 #South East
+				else :
+					neighbour_direction = 0 #South
+			if (bait_direction == neighbour_direction) :
+				target_coordinates = coordinates
+				break
+			else:
+				print("Error : can't move")
+	x = target_coordinates[0]
+	y = target_coordinates[1]
+	moved.emit()
 
 # should return -1 if no bait, or the id of the neigbor case baited
 func LookForABait() -> bool:
 	# should get a bait from simulation list referencing baits put on board
-	if(Bait != null):
-		return true
-	return false
+	if (SimulationRef.baits == []):
+		return false
+	return true
 
-func WaitTillMove() -> void:
-	if(TimeBeforMoving <= 0):
-		Move()
-		TimeBeforMoving = TimeToMove
-	else :
-		await get_tree().create_timer(1.0).timeout
-		TimeBeforMoving -= 1
-		if(LookForABait()):
-			TimeBeforMoving -= 1
-		WaitTillMove()
-	pass
-
-func Die() -> void:
-	# do nothing yet, but should end the game
-	pass
+func _on_timer_timeout() -> void:
+	Move()
+	print(x, y)

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cg34fgn267ecp"]
+
+[ext_resource type="PackedScene" uid="uid://dpyp4pft5p31f" path="res://scenes/simulation.tscn" id="1_wtqvm"]
+[ext_resource type="PackedScene" uid="uid://b25qbw3gewhaq" path="res://scenes/board_viewer.tscn" id="2_x6hs8"]
+[ext_resource type="PackedScene" uid="uid://dqeptxqai5sm3" path="res://scenes/Animals.tscn" id="3_x6hs8"]
+
+[node name="LevelJulien" type="Node2D" unique_id=1222933032]
+
+[node name="Simulation" parent="." unique_id=660034502 instance=ExtResource("1_wtqvm")]
+
+[node name="BoardViewer" parent="." unique_id=618590062 node_paths=PackedStringArray("simulation", "animals") instance=ExtResource("2_x6hs8")]
+simulation = NodePath("../Simulation")
+animals = NodePath("../Animals")
+
+[node name="Animals" parent="." unique_id=1753553358 node_paths=PackedStringArray("SimulationRef") instance=ExtResource("3_x6hs8")]
+SimulationRef = NodePath("../Simulation")
