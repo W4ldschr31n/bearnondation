@@ -66,4 +66,4 @@ static func NewMountain():
 	return Tile.new(3, false, 800, 80)
 	
 static func NewSource(flow=50):
-	return Tile.new(5, true, 100, flow)
+	return Tile.new(4, true, 100, flow)
