@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dpyp4pft5p31f" path="res://scenes/simulation.tscn" id="1_ibiss"]
 [ext_resource type="PackedScene" uid="uid://b25qbw3gewhaq" path="res://scenes/board_viewer.tscn" id="2_c6dvc"]
 [ext_resource type="PackedScene" uid="uid://dqeptxqai5sm3" path="res://scenes/Animals.tscn" id="3_c6dvc"]
+[ext_resource type="AudioStream" uid="uid://gmbumhwnfbf8" path="res://Music/Rise of spirit.mp3" id="4_611at"]
 
 [node name="MainScene" type="Node" unique_id=706600767]
 
@@ -15,3 +16,7 @@ animals = NodePath("../Animals")
 
 [node name="Animals" parent="." unique_id=1753553358 node_paths=PackedStringArray("SimulationRef") instance=ExtResource("3_c6dvc")]
 SimulationRef = NodePath("../Simulation")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1502413549]
+stream = ExtResource("4_611at")
+autoplay = true
