@@ -10,6 +10,7 @@ extends Node
 @onready var timer_label: Label = $Buttons/TimerLabel
 @onready var bait_button: Button = $Buttons/HBoxContainerItems/BaitButton
 @onready var repel_button: Button = $Buttons/HBoxContainerItems/RepelButton
+@export var objective_sprite: Sprite2D
 
 var tile_info_scene = preload("res://scenes/TileInfo.tscn")
 var tile_infos : Array[Array]
@@ -152,10 +153,11 @@ func init_grid():
 			new_widget.set_global_position(coords2D)
 			tile_infos[tile.x][tile.y] = new_widget
 		is_odd_row = not is_odd_row
-	
+	_update_objective_sprite_position()
 	_on_display_grid_button_pressed()
 	_on_animals_moved()
 	update_action_charges()
+	
 	
 func get_atlas_coords_for_tile(tile: Tile) -> Vector2i:
 	if tile.is_source or tile.height >= 4:
@@ -179,14 +181,28 @@ func _on_display_grid_button_pressed() -> void:
 	var is_odd_row = false
 	for y in simulation.height:
 		for x in range(1 if is_odd_row else 0, simulation.width, 2):
-			if(simulation.current_flood_x<x):
-				tile_infos[x][y].display_tile(simulation.get_tile(x, y))
+			var is_obj = (x == simulation.objective_pos.x and y == simulation.objective_pos.y)
+			
+			if(simulation.current_flood_x < x):
+				tile_infos[x][y].display_tile(simulation.get_tile(x, y), is_obj)
 			else:
 				tile_infos[x][y].display_flood()
 				tile_map_layer.set_cell(Vector2i(x, y/2), 0, Vector2i(0, 0))
 		is_odd_row = not is_odd_row
 	_on_animals_moved()
 
+func _update_objective_sprite_position():
+	if objective_sprite and simulation:
+		var obj_pos = simulation.objective_pos
+		
+		var cell_coords = Vector2i(obj_pos.x, obj_pos.y / 2)
+		
+		var local_pos = tile_map_layer.map_to_local(cell_coords)
+		
+		objective_sprite.global_position = tile_map_layer.to_global(local_pos)
+		
+		objective_sprite.visible = true
+		objective_sprite.z_index = 5
 
 func _on_animals_moved() -> void:
 	tile_map_layer_animals.clear()
@@ -206,7 +222,12 @@ func update_visuals():
 			var gray_value = 1.0 - (fog * 0.125) 
 			
 			info.modulate = Color(gray_value, gray_value, gray_value, 1.0)
-			info.display_tile(tile)
+			
+			var is_obj = (tile.x == simulation.objective_pos.x and tile.y == simulation.objective_pos.y)
+			info.display_tile(tile, is_obj)
+			
+			if is_obj and objective_sprite:
+				objective_sprite.modulate.a = gray_value
 			
 			var atlas_coords = get_atlas_coords_for_tile(tile)
 			

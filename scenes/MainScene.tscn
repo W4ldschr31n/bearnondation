@@ -8,7 +8,6 @@
 [node name="MainScene" type="Node" unique_id=706600767]
 
 [node name="Simulation" parent="." unique_id=660034502 instance=ExtResource("1_ibiss")]
-turns_before_flood_starts = 5
 
 [node name="BoardViewer" parent="." unique_id=618590062 node_paths=PackedStringArray("simulation", "animals") instance=ExtResource("2_c6dvc")]
 simulation = NodePath("../Simulation")
@@ -19,6 +18,6 @@ SimulationRef = NodePath("../Simulation")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1502413549]
 stream = ExtResource("4_611at")
-volume_db = -25.0
+volume_db = -20.0
 autoplay = true
 mix_target = 1

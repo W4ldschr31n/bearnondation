@@ -8,6 +8,7 @@ signal moved
 @export var y : int = 0
 
 var MyTile : Tile
+var is_safe : bool = false
 
 func _ready() -> void:
 	if (x % 2 != y % 2):
@@ -15,25 +16,35 @@ func _ready() -> void:
 	moved.emit()
 
 func Move() -> void:
+	if is_safe:
+		return
+
 	MyTile = SimulationRef.get_tile(x, y)
 	if MyTile == null: return
 
 	var valid_neighbours = get_safe_neighbours()
-	
 	if valid_neighbours.is_empty():
-		print("Famille bloquée à ", x, ";", y)
+		print("Famille bloquée !")
 		return
 
 	var target_coordinates = [x, y]
-	var closest_bait_tile = get_closest_action(SimulationRef.ActionType.BAIT)
 	
+	var closest_bait_tile = get_closest_action(SimulationRef.ActionType.BAIT)
+	var objective_tile = SimulationRef.get_tile(SimulationRef.objective_pos.x, SimulationRef.objective_pos.y)
+
 	if closest_bait_tile != null:
 		target_coordinates = get_best_neighbour_towards(valid_neighbours, closest_bait_tile)
+	elif objective_tile != null:
+		target_coordinates = get_best_neighbour_towards(valid_neighbours, objective_tile)
 	else:
 		target_coordinates = choose_autonomous_move(valid_neighbours)
 
 	x = target_coordinates[0]
 	y = target_coordinates[1]
+	
+	if x == SimulationRef.objective_pos.x and y == SimulationRef.objective_pos.y:
+		is_safe = true
+		print("VICTOIRE ! La famille est en sécurité.")
 	
 	if (SimulationRef.get_action_at(x, y) == SimulationRef.ActionType.BAIT):
 		SimulationRef.remove_action_at(x, y)
