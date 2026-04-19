@@ -24,6 +24,8 @@ func Move() -> void:
 
 	var valid_neighbours = get_safe_neighbours()
 	if valid_neighbours.is_empty():
+		Globals.has_won = false
+		get_tree().change_scene_to_file("res://scenes/EndScreen.tscn")
 		print("Famille bloquée !")
 		return
 
@@ -45,6 +47,8 @@ func Move() -> void:
 	if x == SimulationRef.objective_pos.x and y == SimulationRef.objective_pos.y:
 		is_safe = true
 		print("VICTOIRE ! La famille est en sécurité.")
+		Globals.has_won = true
+		get_tree().change_scene_to_file("res://scenes/EndScreen.tscn")
 	
 	if (SimulationRef.get_action_at(x, y) == SimulationRef.ActionType.BAIT):
 		SimulationRef.remove_action_at(x, y)

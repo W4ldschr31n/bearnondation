@@ -1,17 +1,51 @@
 [gd_scene format=3 uid="uid://dagn58ol47owu"]
 
+[ext_resource type="Script" uid="uid://ddfc6mno0pkfl" path="res://scripts/end_screen.gd" id="1_8gjfw"]
 [ext_resource type="Texture2D" uid="uid://dx04injamfniv" path="res://textures/EndScreen.png" id="1_qfurf"]
 
-[node name="Control" type="Control" unique_id=1205577512]
+[node name="EndScreen" type="Control" unique_id=1205577512]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_8gjfw")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=158435967]
 layout_mode = 0
 offset_right = 1933.0
 offset_bottom = 1089.0
 texture = ExtResource("1_qfurf")
+
+[node name="PlayAgain" type="Button" parent="." unique_id=2075476068]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 0
+offset_left = 1432.0
+offset_top = 600.0
+offset_right = 1632.0
+offset_bottom = 700.0
+text = "Ré-essayer"
+
+[node name="Quit" type="Button" parent="." unique_id=236017805]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 0
+offset_left = 1432.0
+offset_top = 714.0
+offset_right = 1632.0
+offset_bottom = 814.0
+text = "Quitter"
+
+[node name="EndText" type="Label" parent="." unique_id=1695527410]
+layout_mode = 0
+offset_left = 337.0
+offset_top = 51.0
+offset_right = 960.0
+offset_bottom = 323.0
+theme_override_font_sizes/font_size = 60
+text = "Victoire !"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="PlayAgain" to="." method="_on_play_again_pressed"]
+[connection signal="pressed" from="Quit" to="." method="_on_quit_pressed"]
