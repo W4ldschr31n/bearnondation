@@ -19,7 +19,7 @@ var current_mode = PlacementMode.SATELLITE
 var current_action_type : Simulation.ActionType = Simulation.ActionType.BAIT
 
 func _ready() -> void:
-	animals.moved.connect(_on_display_grid_button_pressed) # Replace with function body.
+	animals.moved.connect(_on_display_grid_button_pressed)
 	add_to_group("viewer")
 	if simulation == null:
 		simulation = get_parent().get_node("Simulation")
@@ -143,7 +143,8 @@ func init_grid():
 		for x in range(1 if is_odd_row else 0, simulation.width, 2):
 			var tile = simulation.get_tile(x, y)
 			var cell_coordinates = Vector2i(tile.x, tile.y/2)
-			tile_map_layer.set_cell(cell_coordinates, 0, Vector2i(4-tile.height, 0))
+			
+			tile_map_layer.set_cell(cell_coordinates, 0, get_atlas_coords_for_tile(tile))
 			
 			var new_widget : TileInfo = tile_info_scene.instantiate()
 			labels.add_child(new_widget)
@@ -153,6 +154,13 @@ func init_grid():
 		is_odd_row = not is_odd_row
 	
 	_on_display_grid_button_pressed()
+	
+func get_atlas_coords_for_tile(tile: Tile) -> Vector2i:
+	if tile.is_source or tile.height >= 4:
+		return Vector2i(0, 0)
+	
+	var index = clampi(4 - tile.height, 1, 4)
+	return Vector2i(index, 0)
 
 func _on_init_button_pressed() -> void:
 	simulation._init_board_16x9()
@@ -180,7 +188,7 @@ func _on_display_grid_button_pressed() -> void:
 
 
 func _on_animals_moved() -> void:
-	_on_display_grid_button_pressed() # Replace with function body.
+	_on_display_grid_button_pressed()
 
 func update_visuals():
 	var is_odd_row = false
@@ -198,6 +206,11 @@ func update_visuals():
 			info.modulate = Color(gray_value, gray_value, gray_value, 1.0)
 			info.display_tile(tile)
 			
+			var atlas_coords = get_atlas_coords_for_tile(tile)
+			
+			if tile.is_fully_flooded():
+				atlas_coords = Vector2i(0, 0)
+
 			var action = simulation.get_action_at(tile.x, tile.y)
 			if action != null:
 				if action == Simulation.ActionType.BAIT:
@@ -207,7 +220,7 @@ func update_visuals():
 					info.label.text += "\n[REPOUSSE]"
 					info.modulate = Color(1.0, 0.5, 0.5, 1.0)
 
-			tile_map_layer.set_cell(cell_coords, 0, Vector2i(4-tile.height, 0), fog)
+			tile_map_layer.set_cell(cell_coords, 0, atlas_coords, fog)
 				
 		is_odd_row = not is_odd_row
 	

@@ -4,90 +4,104 @@ extends Node
 signal moved
 
 @export var SimulationRef : Simulation
-@export var x : int
-@export var y : int
+@export var x : int = 0
+@export var y : int = 0
 
 var MyTile : Tile
-var TimeBeforMoving = 0.0
-const TimeToMove = 10.0
 
-# move if possible, if a bait exists then toward it, else call the end of the game
-func Move() -> void:
-	MyTile = SimulationRef.get_tile(x, y)
-	var target_coordinates = [x,y]
-	if(LookForABait() == false):
-		for coordinates : Array in SimulationRef.get_tile_neighbours(MyTile):
-			var tile_to_check : Tile = SimulationRef.get_tile(coordinates[0], coordinates[1])
-			if(tile_to_check.is_filled() == false):
-				target_coordinates = coordinates
-				break
-	else :
-		#should get the best bait
-		var baited_case : Tile
-		for line_to_check in SimulationRef.tiles :
-			if (line_to_check != []):
-				for tile_to_check : Tile in line_to_check :
-					if(tile_to_check != null):
-						print(tile_to_check.name, " is tile to check")
-						if(SimulationRef.get_action_at(tile_to_check.x, tile_to_check.y) == SimulationRef.ActionType.BAIT):
-							baited_case = SimulationRef.get_tile(tile_to_check.x, tile_to_check.y)
-		var bait_direction : int
-		if(baited_case.y < y) : # Bait is higher than the animals
-			if(baited_case.x < x) :
-				bait_direction = 5 #North West
-			elif (baited_case.x > x) :
-				bait_direction = 4 #North East
-			else :
-				bait_direction = 3 #North
-		else : # Bait is lower than the animals
-			if(baited_case.x < x) :
-				bait_direction = 2 #South West
-			elif (baited_case.x > x) :
-				bait_direction = 1 #South East
-			else :
-				bait_direction = 0 #South
-		var neighbour_direction : int
-		for coordinates : Array in (SimulationRef.get_tile_neighbours(MyTile)):
-			if(coordinates[1] < y) : # Bait is higher than the animals
-				if(coordinates[0] < x) :
-					neighbour_direction = 5 #North West
-				elif (coordinates[0] > x) :
-					neighbour_direction = 4 #North East
-				else :
-					neighbour_direction = 3 #North
-			else : # Bait is lower than the animals
-				if(coordinates[0] < x) :
-					neighbour_direction = 2 #South West
-				elif (coordinates[0] > x) :
-					neighbour_direction = 1 #South East
-				else :
-					neighbour_direction = 0 #South
-			if (bait_direction == neighbour_direction) :
-				target_coordinates = coordinates
-				break
-			else:
-				print("Error : can't move")
-	x = target_coordinates[0]
-	y = target_coordinates[1]
-	if (SimulationRef.get_action_at(x, y) == SimulationRef.ActionType.BAIT):
-		#enlever l'appat
-		pass
+func _ready() -> void:
+	if (x % 2 != y % 2):
+		y += 1
 	moved.emit()
 
-# should return -1 if no bait, or the id of the neigbor case baited
-func LookForABait() -> bool:
-	# should get a bait from simulation list referencing baits put on board
-	#if (SimulationRef.baits == []):
-		#return false
-	for line_to_check in SimulationRef.tiles :
-		if (line_to_check != []):
-			for tile_to_check : Tile in line_to_check :
-				if(tile_to_check != null):
-					print(tile_to_check.name, " is tile to check")
-					if(SimulationRef.get_action_at(tile_to_check.x, tile_to_check.y) == SimulationRef.ActionType.BAIT):
-						return true
-	return false
+func Move() -> void:
+	MyTile = SimulationRef.get_tile(x, y)
+	if MyTile == null: return
+
+	var valid_neighbours = get_safe_neighbours()
+	
+	if valid_neighbours.is_empty():
+		print("Famille bloquée à ", x, ";", y)
+		return
+
+	var target_coordinates = [x, y]
+	var closest_bait_tile = get_closest_action(SimulationRef.ActionType.BAIT)
+	
+	if closest_bait_tile != null:
+		target_coordinates = get_best_neighbour_towards(valid_neighbours, closest_bait_tile)
+	else:
+		target_coordinates = choose_autonomous_move(valid_neighbours)
+
+	x = target_coordinates[0]
+	y = target_coordinates[1]
+	
+	if (SimulationRef.get_action_at(x, y) == SimulationRef.ActionType.BAIT):
+		SimulationRef.remove_action_at(x, y)
+		
+	moved.emit()
+
+func get_hex_dist(x1: int, y1: int, x2: int, y2: int) -> float:
+	return Vector2(x1, y1 * 0.5).distance_to(Vector2(x2, y2 * 0.5))
+
+func get_closest_action(type: Simulation.ActionType) -> Tile:
+	var closest_tile : Tile = null
+	var min_dist = 999999.0
+	
+	for key in SimulationRef.active_actions:
+		if SimulationRef.active_actions[key] == type:
+			var coords = key.split(",")
+			var tx = int(coords[0])
+			var ty = int(coords[1])
+			var dist = get_hex_dist(x, y, tx, ty)
+			if dist < min_dist:
+				min_dist = dist
+				closest_tile = SimulationRef.get_tile(tx, ty)
+	return closest_tile
+
+func get_safe_neighbours() -> Array:
+	var safe = []
+	var neighbours = SimulationRef.get_tile_neighbours(MyTile)
+	
+	for coords in neighbours:
+		var t = SimulationRef.get_tile(coords[0], coords[1])
+		if t != null:
+			var is_ocean = t.x <= SimulationRef.current_flood_x
+			var is_flooded = t.is_fully_flooded()
+			var is_repelled = SimulationRef.get_action_at(t.x, t.y) == SimulationRef.ActionType.REPELLENT
+			
+			if not is_ocean and not is_flooded and not is_repelled:
+				safe.append(coords)
+			else:
+				print("Case ", coords, " rejetée : Ocean=", is_ocean, " Eau=", is_flooded, " Bombe=", is_repelled)
+	return safe
+
+func get_best_neighbour_towards(neighbours: Array, target: Tile) -> Array:
+	var best_coords = neighbours[0]
+	var min_dist = 999999.0
+	
+	for coords in neighbours:
+		var dist = get_hex_dist(coords[0], coords[1], target.x, target.y)
+		dist -= (coords[0] - x) * 0.01 
+		
+		if dist < min_dist:
+			min_dist = dist
+			best_coords = coords
+	return best_coords
+
+func choose_autonomous_move(neighbours: Array) -> Array:
+	var best = neighbours[0]
+	var max_score = -999999.0
+	
+	for coords in neighbours:
+		var t = SimulationRef.get_tile(coords[0], coords[1])
+		var score = 0.0
+		score += (coords[0] - x) * 100 
+		score += t.height * 10
+		
+		if score > max_score:
+			max_score = score
+			best = coords
+	return best
 
 func _on_timer_timeout() -> void:
 	Move()
-	print(x, y)

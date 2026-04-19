@@ -19,4 +19,6 @@ SimulationRef = NodePath("../Simulation")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1502413549]
 stream = ExtResource("4_611at")
+volume_db = -25.0
 autoplay = true
+mix_target = 1
