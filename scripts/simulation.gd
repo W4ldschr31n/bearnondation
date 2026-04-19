@@ -74,12 +74,12 @@ func _init_with_board(board: Array[Tile], width, height) -> void:
 	sources = []
 	
 	# Check size matches
-	var expected_size = width * height/2
+	var expected_size = (width * height + width%2)/2.0
 	if(board.size() < expected_size):
-		printerr("Not enough tiles to init")
+		printerr("Not enough tiles to init :%d/%d"%[board.size(), expected_size])
 		return
 	elif(board.size() > expected_size):
-		printerr("Too much tiles")
+		printerr("Too much tiles :%d/%d"%[board.size(), expected_size])
 		return
 	
 	for t in board:
@@ -109,6 +109,26 @@ func _init_board_16x9():
 			board.append(Tile.NewHill())
 			
 	_init_with_board(board, 16, 9)
+
+func _init_board_15x13():
+	var board: Array[Tile] = [
+		Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(), Tile.NewHill(), Tile.NewHill(), Tile.NewHill(),
+			Tile.NewForest(), Tile.NewMountain(), Tile.NewSource(), Tile.NewForest(), Tile.NewForest(), Tile.NewHill(), Tile.NewHill(),
+		Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(),
+			Tile.NewHill(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(),
+		Tile.NewForest(), Tile.NewHill(), Tile.NewForest(), Tile.NewHill(), Tile.NewHill(), Tile.NewForest(), Tile.NewMountain(), Tile.NewMountain(),
+			Tile.NewForest(), Tile.NewHill(), Tile.NewMountain(), Tile.NewHill(), Tile.NewForest(), Tile.NewSource(), Tile.NewMountain(),
+		Tile.NewForest(), Tile.NewForest(), Tile.NewHill(), Tile.NewHill(), Tile.NewHill(), Tile.NewMountain(), Tile.NewMountain(), Tile.NewForest(),
+			Tile.NewMountain(), Tile.NewHill(), Tile.NewLand(), Tile.NewLand(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(),
+		Tile.NewMountain(), Tile.NewMountain(), Tile.NewHill(), Tile.NewLand(), Tile.NewLand(), Tile.NewForest(), Tile.NewForest(), Tile.NewHill(),
+			Tile.NewSource(), Tile.NewForest(), Tile.NewHill(), Tile.NewLand(), Tile.NewForest(), Tile.NewForest(), Tile.NewHill(),
+		Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(), Tile.NewHill(), Tile.NewForest(), Tile.NewForest(), Tile.NewHill(), Tile.NewLand(),
+			Tile.NewForest(), Tile.NewForest(), Tile.NewHill(), Tile.NewForest(), Tile.NewHill(), Tile.NewLand(), Tile.NewLand(),
+		Tile.NewForest(), Tile.NewForest(), Tile.NewHill(), Tile.NewHill(), Tile.NewHill(), Tile.NewLand(), Tile.NewLand(), Tile.NewLand(),
+	]
+	
+	_init_with_board(board, 15, 13)
+	print("init 15x13 done")
 
 # LOGIQUE DES SATELLITES
 
@@ -192,8 +212,8 @@ func trickle_down(source: Tile):
 	var source_neighbours = get_tile_neighbours(source)
 	for n in source_neighbours:
 		var neighbour = get_tile(n[0], n[1])
-		
-		if(neighbour.height == source.height-1 || neighbour.height == lowest_height && !neighbour.is_flowing()):
+		var is_just_beneath = (neighbour.height == source.height-1) || (source.is_source && (neighbour.height == source.height-2))
+		if(is_just_beneath || neighbour.height == lowest_height && !neighbour.is_flowing()):
 			trickle_down(neighbour)
 
 # DEBUG
