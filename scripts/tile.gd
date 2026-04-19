@@ -38,6 +38,12 @@ func send_flow(amount : int) -> int:
 		current_flow += flow_qty
 	return amount
 
+func is_fully_flooded() -> bool:
+	return current_filling >= (max_filling * 0.8)
+
+func is_water_source() -> bool:
+	return is_source or height == 4
+
 func flood():
 	self.height = 4
 	self.current_filling = self.max_filling
@@ -48,16 +54,16 @@ func get_fog_level(current_turn: int) -> int:
 	return clampi(turns_passed, 0, 4)
 
 static func NewLand():
-	return Tile.new(0, false, 10, 10)
+	return Tile.new(0, false, 200, 20)
 
 static func NewHill():
-	return Tile.new(1, false, 15, 15)
+	return Tile.new(1, false, 300, 30)
 	
 static func NewForest():
-	return Tile.new(2, false, 20, 20)
+	return Tile.new(2, false, 500, 50)
 	
 static func NewMountain():
-	return Tile.new(3, false, 25, 25)
+	return Tile.new(3, false, 800, 80)
 	
-static func NewSource(flow=100):
-	return Tile.new(4, true, 50, flow)
+static func NewSource(flow=50):
+	return Tile.new(5, true, 100, flow)

@@ -9,8 +9,8 @@ var height: int
 var current_turn: int = 0
 
 # flood
-@export var turns_before_flood_starts: int = 1
-@export var turns_between_flood_advances: int = 2
+@export var turns_before_flood_starts: int = 5
+@export var turns_between_flood_advances: int = 5
 var current_flood_x: int = -1
 
 # animals
@@ -39,21 +39,6 @@ func _ready() -> void:
 		_self_init()
 		
 	
-func _init_board_8x4():
-	_init_with_board(
-		# Tiles
-		[
-			Tile.NewForest(), Tile.NewForest(), Tile.NewMountain(), Tile.NewForest(),
-				Tile.NewHill(), Tile.NewMountain(), Tile.NewMountain(), Tile.NewMountain(),
-			Tile.NewForest(), Tile.NewForest(), Tile.NewSource(50), Tile.NewForest(),
-				Tile.NewHill(), Tile.NewForest(), Tile.NewForest(), Tile.NewForest(),
-		],
-		# Width
-		8,
-		# Height
-		4
-	)
-
 
 enum ActionType { BAIT, REPELLENT }
 
@@ -113,7 +98,7 @@ func _init_board_16x9():
 	for i in range(72):
 		var rand = randf()
 		if i % 18 == 4:
-			board.append(Tile.NewSource(randi_range(150, 300)))
+			board.append(Tile.NewSource(randi_range(30, 60)))
 		elif rand < 0.2:
 			board.append(Tile.NewMountain())
 		elif rand < 0.6:
@@ -206,31 +191,8 @@ func trickle_down(source: Tile):
 	for n in source_neighbours:
 		var neighbour = get_tile(n[0], n[1])
 		
-# version from julien
 		if(neighbour.height == source.height-1 || neighbour.height == lowest_height && !neighbour.is_flowing()):
 			trickle_down(neighbour)
-
-# version from sattelite
-		#if neighbour and neighbour.height == source.height-1:
-			#tiles_to_check.push_front(n)
-			#
-	#var checked_tiles = [[source.x, source.y]]
-	#while flow_to_unload > 0 and tiles_to_check.size() > 0:
-		#var t_coordinates = tiles_to_check.pop_front()
-		#var tile : Tile = tiles[t_coordinates[0]][t_coordinates[1]]
-		#checked_tiles.push_back([tile.x, tile.y])
-		#
-		#var unloadable_flow: int = min(flow_to_unload, tile.max_flow - tile.current_flow)
-		#tile.current_flow += unloadable_flow
-		#flow_to_unload -= unloadable_flow
-		#
-		#var new_neighbours = get_tile_neighbours(tile)
-		#new_neighbours.reverse()
-		#for n in new_neighbours:
-			#var neighbour = get_tile(n[0], n[1])
-			#if neighbour and !checked_tiles.has(n) and !tiles_to_check.has(n) and neighbour.height == tile.height-1:
-				#tiles_to_check.push_front(n)
-
 
 # DEBUG
 
@@ -295,16 +257,22 @@ func process_board():
 	reset_flow()
 	process_sources()
 	process_flood()
-	current_turn += 1
-
+	cleanup_submerged_actions()
 
 func _on_animals_moved() -> void:
-	pass # Replace with function body.
+	pass
 
 func _on_step_timer_timeout() -> void:
 	advance_turn()
 
 func place_action(x: int, y: int, type: ActionType):
+	var tile = get_tile(x, y)
+	if tile == null: return
+	
+	if tile.is_fully_flooded() or tile.x <= current_flood_x:
+		print("Impossible : Vous ne pouvez pas placer d'outil dans l'eau !")
+		return
+	
 	if action_charges[type] > 0:
 		active_actions[str(x) + "," + str(y)] = type
 		action_charges[type] -= 1
@@ -318,3 +286,28 @@ func place_action(x: int, y: int, type: ActionType):
 func get_action_at(x: int, y: int):
 	var key = str(x) + "," + str(y)
 	return active_actions.get(key, null)
+
+func remove_action_at(x: int, y: int):
+	var key = str(x) + "," + str(y)
+	if active_actions.has(key):
+		active_actions.erase(key)
+		var viewer = get_tree().get_first_node_in_group("viewer")
+		if viewer: 
+			viewer.update_visuals()
+
+func cleanup_submerged_actions():
+	var keys_to_remove = []
+	
+	for key in active_actions.keys():
+		var coords = key.split(",")
+		var tx = int(coords[0])
+		var ty = int(coords[1])
+		var tile = get_tile(tx, ty)
+		
+		if tile != null:
+			if tile.is_fully_flooded() or tile.x <= current_flood_x:
+				keys_to_remove.append(key)
+	
+	for key in keys_to_remove:
+		active_actions.erase(key)
+		print("Une action a été emportée par les eaux en : ", key)
