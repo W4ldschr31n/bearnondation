@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://gilphs47c24f" path="res://textures/hexa_tilemap.png" id="2_t7b7u"]
 [ext_resource type="Texture2D" uid="uid://iwob5lw78dun" path="res://textures/satellite.png" id="3_jyyrd"]
 [ext_resource type="Texture2D" uid="uid://dtwl7qyu55xjm" path="res://textures/tiles/BEARS/Bears_128.png" id="3_p5xr7"]
+[ext_resource type="Texture2D" uid="uid://bh6hd888hxiup" path="res://textures/ObjectiveSprite.png" id="5_s2vfw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jyyrd"]
 texture = ExtResource("2_t7b7u")
@@ -88,8 +89,9 @@ glow_blend_mode = 0
 
 [sub_resource type="Compositor" id="Compositor_s2vfw"]
 
-[node name="BoardViewer" type="Node" unique_id=618590062]
+[node name="BoardViewer" type="Node" unique_id=618590062 node_paths=PackedStringArray("objective_sprite")]
 script = ExtResource("1_co73x")
+objective_sprite = NodePath("Objectif")
 
 [node name="Buttons" type="Control" parent="." unique_id=1109274569]
 layout_mode = 3
@@ -233,6 +235,11 @@ texture = ExtResource("3_jyyrd")
 environment = SubResource("Environment_jyyrd")
 camera_attributes = SubResource("CameraAttributesPractical_p5xr7")
 compositor = SubResource("Compositor_s2vfw")
+
+[node name="Objectif" type="Sprite2D" parent="." unique_id=125611062]
+modulate = Color(1, 1, 1, 0.88235295)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("5_s2vfw")
 
 [connection signal="pressed" from="Buttons/VBoxContainer/InitButton" to="." method="_on_init_button_pressed"]
 [connection signal="pressed" from="Buttons/VBoxContainer/ProcessButton" to="." method="_on_process_button_pressed"]

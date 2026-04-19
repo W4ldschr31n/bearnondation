@@ -10,6 +10,7 @@
 script = ExtResource("1_k24pf")
 
 [node name="Simulation" parent="." unique_id=660034502 instance=ExtResource("1_ibiss")]
+objective_pos = Vector2i(14, 2)
 turns_before_flood_starts = 2
 turn_duration = 5.0
 
@@ -23,6 +24,6 @@ y = 6
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1502413549]
 stream = ExtResource("4_611at")
-volume_db = -25.0
+volume_db = -20.0
 autoplay = true
 mix_target = 1

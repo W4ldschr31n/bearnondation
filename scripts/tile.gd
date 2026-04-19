@@ -54,16 +54,16 @@ func get_fog_level(current_turn: int) -> int:
 	return clampi(turns_passed, 0, 4)
 
 static func NewLand():
-	return Tile.new(0, false, 100, 20)
+	return Tile.new(0, false, 100, 50)
 
 static func NewHill():
-	return Tile.new(1, false, 125, 30)
+	return Tile.new(1, false, 125, 70)
 	
 static func NewForest():
-	return Tile.new(2, false, 150, 50)
+	return Tile.new(2, false, 150, 80)
 	
 static func NewMountain():
-	return Tile.new(3, false, 175, 80)
+	return Tile.new(3, false, 175, 100)
 	
 static func NewSource(flow=150):
 	return Tile.new(5, true, 100, flow)

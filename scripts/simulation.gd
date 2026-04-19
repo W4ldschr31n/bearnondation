@@ -7,6 +7,7 @@ var sources : Array
 var width: int
 var height: int
 var current_turn: int = 0
+@export var objective_pos : Vector2i = Vector2i(15, 5)
 
 # flood
 @export var turns_before_flood_starts: int = 5
@@ -37,8 +38,6 @@ func _ready() -> void:
 	
 	if get_tree().current_scene == self:
 		_self_init()
-		
-	
 
 enum ActionType { BAIT, REPELLENT }
 
@@ -57,24 +56,24 @@ func _self_init():
 	process_board()
 	print_board()
 
-func _init_with_board(board: Array[Tile], width, height) -> void:
+func _init_with_board(board: Array[Tile], p_width: int, p_height: int) -> void:
 	var current_x = 0
 	var current_y = 0
 	var is_odd_row = false
-	self.width = width
-	self.height = height
+	self.width = p_width
+	self.height = p_height
 	self.current_flood_x = -1
 	self.current_turn = 0
 	
 	# Init empty tiles
 	tiles = []
-	tiles.resize(width)
-	for i in width:
-		tiles[i].resize(height)
+	tiles.resize(p_width)
+	for i in p_width:
+		tiles[i].resize(p_height)
 	sources = []
 	
 	# Check size matches
-	var expected_size = (width * height + width%2)/2.0
+	var expected_size = (p_width * p_height + p_width%2)/2.0
 	if(board.size() < expected_size):
 		printerr("Not enough tiles to init :%d/%d"%[board.size(), expected_size])
 		return
@@ -90,7 +89,7 @@ func _init_with_board(board: Array[Tile], width, height) -> void:
 		tiles[current_x][current_y] = t
 			
 		current_x += 2
-		if(current_x >= width):
+		if(current_x >= p_width):
 			is_odd_row = not is_odd_row
 			current_x = 1 if is_odd_row else 0
 			current_y += 1
@@ -162,7 +161,6 @@ func trigger_satellite(sat: Satellite):
 			if tile != null:
 				tile.last_revealed_turn = current_turn
 
-# Patterns de scan satellites
 func get_pattern_coordinates(c_x: int, c_y: int, pattern: Satellite.Pattern) -> Array:
 	var coords = [[c_x, c_y]]
 	var center_tile = get_tile(c_x, c_y)
@@ -206,7 +204,6 @@ func foreach_tile(callback: Callable, filter: Callable):
 func trickle_down(source: Tile):
 	if (flow_to_unload==0):
 		return
-	print("Tile ", source.x, ";", source.y, " has ", flow_to_unload, " to unload")
 	flow_to_unload = source.send_flow(flow_to_unload)
 	
 	var source_neighbours = get_tile_neighbours(source)
@@ -216,7 +213,7 @@ func trickle_down(source: Tile):
 		if(is_just_beneath || neighbour.height == lowest_height && !neighbour.is_flowing()):
 			trickle_down(neighbour)
 
-# DEBUG
+# DEBUG ET UTILITAIRES
 
 func print_board():
 	print("--- ÉTAT DU PLATEAU (Tour: ", current_turn, ") ---")
@@ -258,8 +255,7 @@ func process_sources():
 		while flow_to_unload > 0 and lowest_height < source.height:
 			trickle_down(source)
 			lowest_height += 1
-			print("Remaining flow : ", flow_to_unload)
-		print("Overflow : ", flow_to_unload)
+		print("Overflow source en ", source.x, ":", source.y, " = ", flow_to_unload)
 
 func reset_flow():
 	foreach_tile(func (tile: Tile): tile.current_flow = 0, func (tile: Tile): return not tile.is_source && tile.x > current_flood_x)
@@ -281,25 +277,17 @@ func process_board():
 	process_flood()
 	cleanup_submerged_actions()
 
-func _on_animals_moved() -> void:
-	pass
-
-func _on_step_timer_timeout() -> void:
-	advance_turn()
-
-func place_action(x: int, y: int, type: ActionType):
-	var tile = get_tile(x, y)
+func place_action(p_x: int, p_y: int, type: ActionType):
+	var tile = get_tile(p_x, p_y)
 	if tile == null: return
 	
 	if tile.is_fully_flooded() or tile.x <= current_flood_x:
-		print("Impossible : Vous ne pouvez pas placer d'outil dans l'eau !")
+		print("Impossible : Zone inondée !")
 		return
 	
 	if action_charges[type] > 0:
-		active_actions[str(x) + "," + str(y)] = type
+		active_actions[str(p_x) + "," + str(p_y)] = type
 		action_charges[type] -= 1
-		print("Action placée: ", type, " Charges restantes: ", action_charges[type])
-		
 		var viewer = get_tree().get_first_node_in_group("viewer")
 		if viewer: viewer.update_visuals()
 	else:
@@ -307,31 +295,24 @@ func place_action(x: int, y: int, type: ActionType):
 		
 	action_used.emit()
 
-func get_action_at(x: int, y: int):
-	var key = str(x) + "," + str(y)
+func get_action_at(p_x: int, p_y: int):
+	var key = str(p_x) + "," + str(p_y)
 	return active_actions.get(key, null)
 
-func remove_action_at(x: int, y: int):
-	var key = str(x) + "," + str(y)
+func remove_action_at(p_x: int, p_y: int):
+	var key = str(p_x) + "," + str(p_y)
 	if active_actions.has(key):
 		active_actions.erase(key)
 		var viewer = get_tree().get_first_node_in_group("viewer")
-		if viewer: 
-			viewer.update_visuals()
+		if viewer: viewer.update_visuals()
 
 func cleanup_submerged_actions():
 	var keys_to_remove = []
-	
 	for key in active_actions.keys():
 		var coords = key.split(",")
-		var tx = int(coords[0])
-		var ty = int(coords[1])
-		var tile = get_tile(tx, ty)
-		
-		if tile != null:
-			if tile.is_fully_flooded() or tile.x <= current_flood_x:
-				keys_to_remove.append(key)
+		var tile = get_tile(int(coords[0]), int(coords[1]))
+		if tile != null and (tile.is_fully_flooded() or tile.x <= current_flood_x):
+			keys_to_remove.append(key)
 	
 	for key in keys_to_remove:
 		active_actions.erase(key)
-		print("Une action a été emportée par les eaux en : ", key)
