@@ -2,10 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dc6pr3r0fabx" path="res://scripts/Animals.gd" id="1_24gem"]
 
-[node name="Animals" type="Node2D" unique_id=1753553358]
+[node name="Animals" type="Node" unique_id=1473359031]
 script = ExtResource("1_24gem")
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=608678796]
 
 [node name="Timer" type="Timer" parent="." unique_id=1392456350]
 wait_time = 5.418

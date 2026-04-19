@@ -77,6 +77,8 @@ tile_size = Vector2i(128, 128)
 sources/1 = SubResource("TileSetAtlasSource_s2vfw")
 
 [sub_resource type="Environment" id="Environment_jyyrd"]
+background_mode = 1
+background_color = Color(0.14117648, 0.15294118, 0.03529412, 1)
 glow_enabled = true
 glow_intensity = 1.5
 glow_bloom = 0.35
@@ -144,25 +146,25 @@ alignment = 1
 [node name="SatelliteButton circle" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=100041873]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite Circle"
+text = "Satellite Sentinel-1 (cercle)"
 autowrap_mode = 2
 
 [node name="SatelliteButton oval" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=445032683]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite Oval"
+text = "Satellite Sentinel-2 (ovale)"
 autowrap_mode = 2
 
 [node name="SatelliteButton column" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=23254623]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite Column"
+text = "Satellite SWOT (colonne)"
 autowrap_mode = 2
 
 [node name="SatelliteButton butterfly" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=583112244]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite Butterfly"
+text = "Satellite LANDSAT (papillon)"
 autowrap_mode = 2
 
 [node name="TimerLabel" type="Label" parent="Buttons" unique_id=415261863]
@@ -190,12 +192,12 @@ grow_vertical = 0
 [node name="BaitButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=185603280]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
-text = "  Bait  "
+text = "  Appât"
 
 [node name="RepelButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=495193646]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
-text = "Repel"
+text = "Repousse"
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=248759777]
 position = Vector2(354, 34)

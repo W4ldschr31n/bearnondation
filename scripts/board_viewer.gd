@@ -8,6 +8,8 @@ extends Node
 @onready var labels: Control = $Labels
 @onready var ghost: Sprite2D = $SatelliteGhost
 @onready var timer_label: Label = $Buttons/TimerLabel
+@onready var bait_button: Button = $Buttons/HBoxContainerItems/BaitButton
+@onready var repel_button: Button = $Buttons/HBoxContainerItems/RepelButton
 
 var tile_info_scene = preload("res://scenes/TileInfo.tscn")
 var tile_infos : Array[Array]
@@ -20,6 +22,7 @@ var current_action_type : Simulation.ActionType = Simulation.ActionType.BAIT
 
 func _ready() -> void:
 	animals.moved.connect(_on_display_grid_button_pressed)
+	simulation.action_used.connect(update_action_charges)
 	add_to_group("viewer")
 	if simulation == null:
 		simulation = get_parent().get_node("Simulation")
@@ -152,6 +155,7 @@ func init_grid():
 	
 	_on_display_grid_button_pressed()
 	_on_animals_moved()
+	update_action_charges()
 	
 func get_atlas_coords_for_tile(tile: Tile) -> Vector2i:
 	if tile.is_source or tile.height >= 4:
@@ -229,6 +233,18 @@ func _update_action_ui_labels():
 		get_node("Buttons/BaitCount").text = "x" + str(simulation.action_charges[Simulation.ActionType.BAIT])
 	if has_node("Buttons/RepellentCount"):
 		get_node("Buttons/RepellentCount").text = "x" + str(simulation.action_charges[Simulation.ActionType.REPELLENT])
+
+# SIGNAUX SIMULATION
+
+func update_action_charges():
+	var nb_bait = simulation.action_charges[Simulation.ActionType.BAIT]
+	bait_button.text = "Appât (%d restant)" % nb_bait
+	if nb_bait <= 0:
+		bait_button.disabled = true
+	var nb_repel =  simulation.action_charges[Simulation.ActionType.REPELLENT]
+	if nb_repel <= 0:
+		repel_button.disabled = true
+	repel_button.text = "Repousse (%d restant)" % nb_repel
 
 # SIGNAUX UI
 

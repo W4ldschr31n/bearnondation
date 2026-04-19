@@ -49,6 +49,8 @@ var action_charges : Dictionary = {
 	ActionType.REPELLENT: 2
 }
 
+signal action_used
+
 func _self_init():
 	_init_board_16x9()
 	print("--- Plateau 16x9 Initialisé ---")
@@ -282,6 +284,8 @@ func place_action(x: int, y: int, type: ActionType):
 		if viewer: viewer.update_visuals()
 	else:
 		print("Plus de charges pour cette action !")
+		
+	action_used.emit()
 
 func get_action_at(x: int, y: int):
 	var key = str(x) + "," + str(y)
