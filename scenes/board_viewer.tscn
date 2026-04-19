@@ -1,13 +1,14 @@
-[gd_scene format=3 uid="uid://b25qbw3gewhaq"]
+[gd_scene format=4 uid="uid://b25qbw3gewhaq"]
 
 [ext_resource type="Script" uid="uid://cx7qh7bbx18iq" path="res://scripts/board_viewer.gd" id="1_co73x"]
 [ext_resource type="Texture2D" uid="uid://gilphs47c24f" path="res://textures/hexa_tilemap.png" id="2_t7b7u"]
 [ext_resource type="Texture2D" uid="uid://iwob5lw78dun" path="res://textures/satellite.png" id="3_jyyrd"]
+[ext_resource type="Texture2D" uid="uid://dtwl7qyu55xjm" path="res://textures/tiles/BEARS/Bears_128.png" id="3_p5xr7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jyyrd"]
 texture = ExtResource("2_t7b7u")
-texture_region_size = Vector2i(64, 64)
-0:0/next_alternative_id = 5
+texture_region_size = Vector2i(128, 128)
+0:0/next_alternative_id = 6
 0:0/0 = 0
 0:0/1 = 1
 0:0/1/modulate = Color(0.8134106, 0.8134106, 0.8134106, 1)
@@ -61,8 +62,19 @@ texture_region_size = Vector2i(64, 64)
 [sub_resource type="TileSet" id="TileSet_p5xr7"]
 tile_shape = 3
 tile_offset_axis = 1
-tile_size = Vector2i(64, 64)
+tile_size = Vector2i(128, 128)
 sources/0 = SubResource("TileSetAtlasSource_jyyrd")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s2vfw"]
+texture = ExtResource("3_p5xr7")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_e30rl"]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(128, 128)
+sources/1 = SubResource("TileSetAtlasSource_s2vfw")
 
 [sub_resource type="Environment" id="Environment_jyyrd"]
 glow_enabled = true
@@ -79,17 +91,17 @@ script = ExtResource("1_co73x")
 
 [node name="Buttons" type="Control" parent="." unique_id=1109274569]
 layout_mode = 3
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 300.0
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Buttons" unique_id=1920040955]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Buttons" unique_id=1920040955]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 300.0
 grow_vertical = 2
 
 [node name="InitButton" type="Button" parent="Buttons/VBoxContainer" unique_id=1383156450]
@@ -113,46 +125,45 @@ layout_mode = 2
 text = "DisplayGrid"
 
 [node name="HBoxContainerSatellite" type="HBoxContainer" parent="Buttons" unique_id=370128850]
+z_index = 10
+custom_minimum_size = Vector2(550, 0)
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 287.5
-offset_top = -148.0
-offset_right = 587.5
-offset_bottom = 2.0
+offset_left = -666.0
+offset_top = -130.0
+offset_right = -54.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 0
+alignment = 1
 
 [node name="SatelliteButton circle" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=100041873]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite
-Patern
-circle"
+text = "Satellite Circle"
+autowrap_mode = 2
 
 [node name="SatelliteButton oval" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=445032683]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite
-Paterne
-oval"
+text = "Satellite Oval"
+autowrap_mode = 2
 
 [node name="SatelliteButton column" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=23254623]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite
-Paterne
-column"
+text = "Satellite Column"
+autowrap_mode = 2
 
 [node name="SatelliteButton butterfly" type="Button" parent="Buttons/HBoxContainerSatellite" unique_id=583112244]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Satellite
-Paterne
-butterfly"
+text = "Satellite Butterfly"
+autowrap_mode = 2
 
 [node name="TimerLabel" type="Label" parent="Buttons" unique_id=415261863]
 layout_mode = 0
@@ -162,30 +173,38 @@ offset_right = 1025.0
 offset_bottom = 28.0
 
 [node name="HBoxContainerItems" type="HBoxContainer" parent="Buttons" unique_id=1827117754]
-layout_mode = 0
-offset_left = 950.0
-offset_top = 500.0
-offset_right = 1154.0
-offset_bottom = 650.0
+z_index = 10
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 190.00098
+offset_top = -130.0
+offset_right = 494.00098
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="BaitButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=185603280]
-custom_minimum_size = Vector2(100, 50)
+custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 text = "  Bait  "
 
 [node name="RepelButton" type="Button" parent="Buttons/HBoxContainerItems" unique_id=495193646]
-custom_minimum_size = Vector2(100, 50)
+custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 text = "Repel"
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=248759777]
-position = Vector2(325, 150)
-tile_map_data = PackedByteArray(0, 0, 255, 255, 251, 255, 0, 0, 0, 0, 0, 0, 0, 0)
+position = Vector2(354, 34)
+tile_map_data = PackedByteArray("AAD///v/AAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAABAAAAAAABAAAAAAABAAAAAAACAAAAAAACAAAAAAADAAAAAAACAAAAAAADAAEAAAACAAAAAAACAAIAAAABAAAAAAAEAAEAAAADAAAAAAAEAAAAAAADAAAAAAAEAAIAAAAAAAAAAAAFAAEAAAAEAAAAAAAFAAAAAAAEAAAAAAAGAAAAAAAEAAAAAAAGAAEAAAACAAAAAAAFAAIAAAABAAAAAAAGAAIAAAAEAAAAAAAAAAAAAAACAAAAAAAAAAEAAAADAAAAAAAAAAIAAAADAAAAAAABAAIAAAADAAAAAAAAAAMAAAABAAAAAAABAAMAAAABAAAAAAACAAMAAAABAAAAAAADAAIAAAABAAAAAAAEAAMAAAABAAAAAAAFAAMAAAABAAAAAAAGAAMAAAABAAAAAAADAAMAAAABAAAAAAAHAAIAAAABAAAAAAAHAAEAAAABAAAAAAAHAAAAAAABAAAAAAAIAAAAAAADAAAAAAAIAAEAAAADAAAAAAAIAAIAAAADAAAAAAAIAAMAAAADAAAAAAAHAAMAAAADAAAAAAAAAAQAAAADAAAAAAACAAQAAAADAAAAAAAEAAQAAAADAAAAAAAGAAQAAAADAAAAAAAJAAAAAAABAAAAAAAKAAAAAAABAAAAAAAKAAEAAAABAAAAAAALAAAAAAABAAAAAAAMAAAAAAABAAAAAAANAAAAAAABAAAAAAAOAAEAAAABAAAAAAAOAAIAAAABAAAAAAANAAEAAAABAAAAAAAMAAEAAAABAAAAAAALAAEAAAABAAAAAAAJAAEAAAABAAAAAAAJAAIAAAABAAAAAAAKAAIAAAABAAAAAAALAAIAAAABAAAAAAAMAAIAAAABAAAAAAAOAAMAAAABAAAAAAAOAAQAAAABAAAAAAANAAQAAAABAAAAAAANAAMAAAABAAAAAAANAAIAAAABAAAAAAAMAAMAAAABAAAAAAALAAMAAAABAAAAAAAKAAQAAAABAAAAAAAKAAMAAAABAAAAAAAJAAMAAAABAAAAAAAIAAQAAAABAAAAAAAOAAUAAAABAAAAAAAOAAYAAAABAAAAAAANAAUAAAABAAAAAAAMAAYAAAABAAAAAAAJAAUAAAABAAAAAAAKAAYAAAABAAAAAAAKAAUAAAABAAAAAAALAAUAAAABAAAAAAALAAQAAAABAAAAAAAMAAQAAAABAAAAAAAMAAUAAAABAAAAAAAIAAYAAAABAAAAAAAIAAUAAAABAAAAAAAJAAQAAAABAAAAAAAHAAQAAAABAAAAAAAHAAUAAAABAAAAAAAGAAUAAAABAAAAAAAFAAQAAAABAAAAAAAEAAUAAAABAAAAAAADAAQAAAABAAAAAAACAAUAAAABAAAAAAABAAQAAAABAAAAAAAAAAUAAAABAAAAAAABAAUAAAABAAAAAAAAAAYAAAABAAAAAAACAAYAAAABAAAAAAADAAUAAAABAAAAAAAEAAYAAAABAAAAAAAFAAUAAAABAAAAAAAGAAYAAAABAAAAAAAOAAAAAAACAAAAAAA=")
 tile_set = SubResource("TileSet_p5xr7")
 
 [node name="HighlightLayer" type="TileMapLayer" parent="." unique_id=1452710280]
 z_index = 1
-position = Vector2(325, 150)
+position = Vector2(354, 34)
 tile_set = SubResource("TileSet_p5xr7")
 y_sort_origin = -1
 
@@ -199,8 +218,9 @@ offset_bottom = 40.0
 
 [node name="TileMapLayerAnimals" type="TileMapLayer" parent="." unique_id=1263514585]
 z_index = 1
-position = Vector2(325, 150)
-tile_set = SubResource("TileSet_p5xr7")
+position = Vector2(354, 34)
+tile_map_data = PackedByteArray("AAAAAAEAAQAAAAAAAAA=")
+tile_set = SubResource("TileSet_e30rl")
 
 [node name="SatelliteGhost" type="Sprite2D" parent="." unique_id=450981833]
 modulate = Color(1, 1, 1, 0.49019608)

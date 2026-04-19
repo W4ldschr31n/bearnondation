@@ -34,7 +34,9 @@ func _process(_delta: float) -> void:
 	else:
 		if highlight_layer:
 			highlight_layer.clear()
-	
+	if Input.is_action_just_pressed("mouse_click"):
+		if is_placing_satellite:
+			place_satellite_at_mouse()
 	update_timer_display()
 
 func update_timer_display():
@@ -88,11 +90,6 @@ func update_satellite_ghost_position():
 	var grid_pos = tile_map_layer.local_to_map(mouse_pos)
 	var local_snapped_pos = tile_map_layer.map_to_local(grid_pos)
 	ghost.global_position = tile_map_layer.to_global(local_snapped_pos)
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if is_placing_satellite:
-			place_satellite_at_mouse()
 
 func place_satellite_at_mouse():
 	var mouse_pos = tile_map_layer.get_local_mouse_position()
@@ -176,7 +173,7 @@ func _on_display_grid_button_pressed() -> void:
 				tile_map_layer.set_cell(Vector2i(x, y/2), 0, Vector2i(0, 0))
 		is_odd_row = not is_odd_row
 	tile_map_layer_animals.clear()
-	tile_map_layer_animals.set_cell(Vector2i(animals.x, animals.y/2), 0, Vector2i(4, 0))
+	tile_map_layer_animals.set_cell(Vector2i(animals.x, animals.y/2), 0, Vector2i(0, 0))
 
 
 func _on_animals_moved() -> void:
