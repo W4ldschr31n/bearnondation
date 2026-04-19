@@ -155,16 +155,11 @@ func init_grid():
 	_on_display_grid_button_pressed()
 
 func _on_init_button_pressed() -> void:
-	simulation._init_board_8x4()
+	simulation._init_board_16x9()
 	init_grid()
-
-#func _on_init_button_pressed():
-	#simulation._init_board_16x9()
-	#init_grid()
 
 func _on_print_button_pressed() -> void:
 	simulation.print_board()
-
 
 func _on_process_button_pressed() -> void:
 	simulation.process_board()

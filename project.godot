@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Bearnondation"
-run/main_scene="uid://cfm31u0cl22xg"
+run/main_scene="uid://ryj7jfph01dn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

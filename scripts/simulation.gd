@@ -65,10 +65,8 @@ var action_charges : Dictionary = {
 }
 
 func _self_init():
-	_init_board_8x4()
-	print("--- Plateau 8x4 Initialisé ---")
-	#_init_board_16x9()
-	#print("--- Plateau 16x9 Initialisé ---")
+	_init_board_16x9()
+	print("--- Plateau 16x9 Initialisé ---")
 	process_board()
 	print_board()
 
@@ -97,16 +95,13 @@ func _init_with_board(board: Array[Tile], width, height) -> void:
 		printerr("Too much tiles")
 		return
 	
-	# Read board
 	for t in board:
-		# Record tile
 		t.x = current_x
 		t.y = current_y
 		if(t.is_source):
 			sources.append([current_x, current_y])
 		tiles[current_x][current_y] = t
 			
-		# Update index
 		current_x += 2
 		if(current_x >= width):
 			is_odd_row = not is_odd_row
