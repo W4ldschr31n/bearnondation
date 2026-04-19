@@ -27,7 +27,7 @@ offset_top = 645.0
 offset_right = 1134.0
 offset_bottom = 778.0
 theme_override_font_sizes/font_size = 60
-text = "PLAY"
+text = "JOUER"
 
 [connection signal="button_down" from="StartButton" to="." method="_on_start_button_button_down"]
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
