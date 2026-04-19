@@ -151,6 +151,7 @@ func init_grid():
 		is_odd_row = not is_odd_row
 	
 	_on_display_grid_button_pressed()
+	_on_animals_moved()
 	
 func get_atlas_coords_for_tile(tile: Tile) -> Vector2i:
 	if tile.is_source or tile.height >= 4:
@@ -180,12 +181,12 @@ func _on_display_grid_button_pressed() -> void:
 				tile_infos[x][y].display_flood()
 				tile_map_layer.set_cell(Vector2i(x, y/2), 0, Vector2i(0, 0))
 		is_odd_row = not is_odd_row
-	tile_map_layer_animals.clear()
-	tile_map_layer_animals.set_cell(Vector2i(animals.x, animals.y/2), 0, Vector2i(0, 0))
+	_on_animals_moved()
 
 
 func _on_animals_moved() -> void:
-	_on_display_grid_button_pressed()
+	tile_map_layer_animals.clear()
+	tile_map_layer_animals.set_cell(Vector2i(animals.x, animals.y/2), 1, Vector2i(0, 0))
 
 func update_visuals():
 	var is_odd_row = false
